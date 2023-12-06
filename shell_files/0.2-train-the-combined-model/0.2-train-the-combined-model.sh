@@ -1,0 +1,1 @@
+python /home/david/Desktop/projects/thesis/combined_downstream_upstram/shell_files/0.2-train-the-combined-model/0.2-train-the-combined-model.py
