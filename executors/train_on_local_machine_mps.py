@@ -191,6 +191,10 @@ def trainer(seed,                    # seed
         tprforbudget = get_tpr_for_fpr_budget(y_val, y_val_pred, fpr_budget = 0.6)
         
         ## Save loss
+        try:
+            os.mkdir(saving_path)
+        except:
+            pass
         with open(f'{saving_path}/loss.pkl', 'wb') as f: # loss is saved regardless of results
             pickle.dump(losses, f)
         
