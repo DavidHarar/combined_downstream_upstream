@@ -40,6 +40,9 @@ def trainer(seed,                    # seed
             saving_path,
             clip,
             impute_only_missing,
+            upstream_model,
+            downstream_model,
+            continue_training_upstream_model,
             minimal_number_of_leads=None,
             leads = ['LI', 'LII', 'LIII', 'aVF', 'aVL', 'aVR','V1','V2','V3','V4','V5','V6'],
             eval_metric = 'loss',
@@ -51,6 +54,15 @@ def trainer(seed,                    # seed
          ):
     """
     Train an experiment, save results optionally.
+
+
+    Inputs:
+    - impute_only_missing: when in the downstream model, for the empty leads we should use the imputation. For the non empty leads we can either
+        use the imputed or the original ones. If <impute_only_missing> is True, the data that will be entered to the downstream model is the origianl
+        signals when possible, and imputed signals when the original signal was zero. If False, the downstream data will use all the leads as they were
+        imputed. 
+    - upstream_model: A pre-trained upstream model. Can be either trained together with the downstream or not.
+    - downstream_model: A downstream model to be trained.
     """
     
     # TODO:
@@ -124,6 +136,9 @@ def trainer(seed,                    # seed
     
     # create a model
     # ------------------
+    
+
+
     model = CombinedModel(impute_only_missing)
     print(count_parameters(model))
     model = model.to(device)
