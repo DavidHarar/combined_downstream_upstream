@@ -57,21 +57,9 @@ device                   = device = torch.device('cuda' if torch.cuda.is_availab
 
 
 class CombinedModel(torch.nn.Module):
-    def __init__(self, impute_only_missing=False):
+    def __init__(self, upstream_model, downstream_model, impute_only_missing=False):
         super(CombinedModel, self).__init__()
-        # Load Downstream model
-
-        downstream_model = DownstreamInception(dropout, num_inputs=12)
-        downstream_model.load_state_dict(torch.load(downstream_path, map_location=device))
-        # downstream_model = downstream_model.to(device)
-
-        # Load upstream model
-        upstream_model = TSTransformerEncoderCNN(input_dimension, output_dimension, hidden_dimmension,
-                 attention_heads, encoder_number_of_layers,  
-                 dropout, dim_feedforward=512, kernel_size=3, activation='gelu')
-        upstream_model.load_state_dict(torch.load(upstream_path, map_location=device))
-        # upstream_model = upstream_model.to(device)
-
+        
         self.upstream_model = upstream_model
         self.downstream_model = downstream_model
         self.impute_only_missing = impute_only_missing
