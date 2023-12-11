@@ -136,13 +136,10 @@ def trainer(seed,                    # seed
     
     # create a model
     # ------------------
-    
-
-
-    model = CombinedModel(impute_only_missing)
-    print(count_parameters(model))
+    model = CombinedModel(upstream_model, downstream_model, device, continue_training_upstream_model, impute_only_missing)
     model = model.to(device)
     optimizer = optim.AdamW(model.parameters(), weight_decay=weight_decay, lr=lr)
+    print(count_parameters(model))
 
 
     if len(targets)>1:
