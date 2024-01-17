@@ -6,8 +6,10 @@ import torch.optim as optim
 import random
 import time
 
-from downstream_classification.dataloader.DataLoader import DataGenerator
-from combined_downstream_upstram.modeling.JointModel import CombinedModel
+from downstream_classification.dataloader.DataGenerator import DataGenerator
+from combined_downstream_upstream.modeling.JointModel import CombinedModel
+# from downstream_classification.dataloader.DataLoader import DataGenerator
+# from combined_downstream_upstram.modeling.JointModel import CombinedModel
 
 
 import numpy as np
@@ -17,9 +19,13 @@ import seaborn as sns
 from tqdm import trange
 from tqdm.auto import tqdm
 from downstream_classification.utils.metrics import *
+from combined_downstream_upstream.utils.plots import *
 from sklearn.model_selection import ParameterGrid
 
 import os
+
+import logging
+
 
 # to be moved to utils
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -33,24 +39,25 @@ def process(X):
 def trainer(seed,                    # seed
             metadata_file_path,      # metadata file include 
             data_folder_path, 
-            fillna,
             targets,
             batch_size, 
             n_epochs,
-            saving_path,
             clip,
+
             impute_only_missing,
             upstream_model,
             downstream_model,
             continue_training_upstream_model,
-            minimal_number_of_leads=None,
+            model_saving_path,
+
             leads = ['LI', 'LII', 'LIII', 'aVF', 'aVL', 'aVR','V1','V2','V3','V4','V5','V6'],
             eval_metric = 'loss',
             weight_decay = 0,
             lr = 0.001,
-            verbosity = False,
             patience=np.inf,
             loss_function_weight = None,
+
+            check_on_test = False,
          ):
     """
     Train an experiment, save results optionally.
@@ -70,7 +77,20 @@ def trainer(seed,                    # seed
     # 1. Fix saving path. We want to save best plot, save best model, save history, in a folder assiciated with params
     # 2. Return results and params so we can append it with the rest.
 
+    
+    # extract target string
+    target_str = targets[0] if isinstance(targets,list) else targets
 
+    # Init experiment directory
+    if not os.path.exists(model_saving_path):
+        os.makedirs(model_saving_path)
+
+    # init log
+    logging.basicConfig(filename=f"./{model_saving_path}/log.log", level=logging.INFO,
+                            format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M')
+    logging.info("Fit the preprocessing pipeline")
+
+    
 
     # create a mapping for all possible leads
     # ------------------
@@ -84,9 +104,7 @@ def trainer(seed,                    # seed
     torch.cuda.manual_seed(seed)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = torch.device(device)
-    print('\n')
-    print(f'training using device: {device}')
-    print('\n')
+    logging.info(f'Training using device: {device}')
 
     # convert loss_function_weight
     if loss_function_weight:
@@ -95,6 +113,7 @@ def trainer(seed,                    # seed
 
     # Create Generators
     # ------------------
+    logging.info(f'Creating generators')
     train_generator = DataGenerator(
         metadata_file_path= metadata_file_path,                 # path to metadata file
         data_folder_path = data_folder_path,                    # path to individual signals
@@ -102,12 +121,8 @@ def trainer(seed,                    # seed
         targets=targets,                                        # list of targets we want train on
         batch_size=batch_size,                                  # batch size
         shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
-        fillna = fillna,
-        minimal_number_of_leads = minimal_number_of_leads,
-        leads = relevant_leads_indices
+        seed = seed
                     )
-
-
     validation_generator = DataGenerator(
         metadata_file_path= metadata_file_path,                 # path to metadata file
         data_folder_path = data_folder_path,                    # path to individual signals
@@ -115,9 +130,7 @@ def trainer(seed,                    # seed
         targets=targets,                                        # list of targets we want train on
         batch_size=batch_size,                                  # batch size
         shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
-        fillna = fillna,
-        minimal_number_of_leads=minimal_number_of_leads,
-        leads = relevant_leads_indices
+        seed = seed
                     )
 
     test_generator = DataGenerator(
@@ -127,9 +140,7 @@ def trainer(seed,                    # seed
         targets=targets,                                        # list of targets we want train on
         batch_size=batch_size,                                  # batch size
         shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
-        fillna = fillna,
-        minimal_number_of_leads=minimal_number_of_leads,
-        leads = relevant_leads_indices
+        seed = seed
                                 )
     
     
@@ -150,21 +161,28 @@ def trainer(seed,                    # seed
         else: 
             criterion = nn.BCELoss()
 
-    if verbosity:
-        print(f'The model has {count_parameters(model):,} trainable parameters')
-        print(model)
+    logging.info(f'The model has {count_parameters(model):,} trainable parameters')
+    logging.info('* Model:')
+    logging.info('* -----------')
+    logging.info(model)
+    logging.info('* -----------')
 
 
     # Training
     # ------------------
     
-    # Initiate values
+    # initiate values
     best_valid_loss = float('inf')
-    best_aucper = 0
+    best_aucpr = 0
+    best_rocauc = 0
+    
+    rocauc_given_best_aucpr = 0
+    epochs_without_update = 0   
+    best_recall_for_precision = 0
+
     losses = {'train':[],
               'validation':[]}
-    epochs_without_update = 0
-    # best_aucper, rocauc_given_best_aucpr, tprforbudget_given_best_aucpr = None, None, None
+
     
     # Training loop
     for epoch in range(n_epochs):
@@ -190,87 +208,252 @@ def trainer(seed,                    # seed
                               device
                               )
         
+        # test
+        if check_on_test:
+            test_loss, y_test, y_test_pred = evaluate_epoch(model, 
+                                test_generator, 
+                                criterion, 
+                                device
+                                )
+        
         # store losses
         losses['train'].append(train_loss)
         losses['validation'].append(valid_loss)
 
 
-        # Handle Resutls
+        # Plot distributions
+        y_train_prediction = pd.DataFrame({'y_train': y_train,
+                                           'y_train_pred':y_train_pred})
         
-        ## Get KPIs
+        y_valication_prediction = pd.DataFrame({'y_val': y_val,
+                                               'y_val_pred':y_val_pred})
+        
+        y_test_prediction = pd.DataFrame({'y_test': y_test,
+                                               'y_test_pred':y_test_pred})
+                
+        # save loss
+        if model_saving_path:
+            with open(f'{model_saving_path}/loss.pkl', 'wb') as f:
+                pickle.dump(losses, f)
+        
+        # take ending time
+        end_time = time.time()
+        
+        epoch_mins, epoch_secs = epoch_time(start_time, end_time)
         aucpr  = PRAUC(y_val, y_val_pred)
-        aucroc = ROCAUC(y_val, y_val_pred)
-        tprforbudget = get_tpr_for_fpr_budget(y_val, y_val_pred, fpr_budget = 0.6)
+        rocauc = ROCAUC(y_val, y_val_pred)
+        recall_for_precision, threshold = MaxRecall_for_MinPrecision(y_val, y_val_pred, min_precision=0.4)
+
+        # results on test
+        aucpr_test  = PRAUC(y_test, y_test_pred)
+        rocauc_test = ROCAUC(y_test, y_test_pred)
         
-        ## Save loss
-        try:
-            os.mkdir(saving_path)
-        except:
-            pass
-        with open(f'{saving_path}/loss.pkl', 'wb') as f: # loss is saved regardless of results
-            pickle.dump(losses, f)
-        
-        ## keep best model
+        # patience
         if eval_metric == 'loss':
             if valid_loss < best_valid_loss:
-                best_valid_loss = valid_loss
-
-                if saving_path:
-                    print(f'New best validation loss was found, current best valid loss is {np.round(best_valid_loss,4)}')
-                    torch.save(model.state_dict(), f'{saving_path}/model.pt')
-
-                    # save plots
-                    plot_maker(y_train, y_train_pred, y_val, y_val_pred, saving_path, '')
-
-                epochs_without_update = 0 # if we update then patience restarts
+                epochs_without_update = 0
             else:
                 epochs_without_update+=1
-                
-
         if eval_metric == 'aucpr':
-            if aucpr>best_aucper:
-                try:
-                    best_aucper = aucpr
-                    rocauc_given_best_aucpr = aucroc
-                    tprforbudget_given_best_aucpr = tprforbudget
-                except:
-                    best_aucper = aucpr
-                
-                if saving_path:
-                    # save model
-                    print(f'New best aucpr was found, current best aucpr is {np.round(best_aucper,4)}')
-                    torch.save(model.state_dict(), f'{saving_path}/model.pt')
-
-                    # save plots
-                    plot_maker(y_train, y_train_pred, y_val, y_val_pred, saving_path, '')
-
-                epochs_without_update = 0 # if we update then patience restarts
-
+            if aucpr > best_aucpr:
+                epochs_without_update = 0
             else:
                 epochs_without_update+=1
-        
+        if eval_metric == 'rocauc':
+            if rocauc > best_rocauc:
+                epochs_without_update = 0
+            else:
+                epochs_without_update+=1
+        if eval_metric == 'recall_for_precision':
+            if recall_for_precision > best_recall_for_precision:
+                epochs_without_update = 0
+            else:
+                epochs_without_update+=1
+
+        # break if patience condition takes place
         if epochs_without_update>patience:
             break
         
 
-        # take ending time
-        end_time = time.time()
-        epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-
         
-        # print summary
-        print('-'*45)
-        print(f'Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s')
-        print(f'\tTrain Loss: {train_loss:.3f}')
-        print(f'\t Val. Loss: {valid_loss:.3f}')
-        print(f'\t ROC-AUC: {aucroc:.3f}')
-        print(f'\t PR-AUC: {aucpr:.3f}')
-        print(f'\t TPR for FPR=0.6 Budget: {tprforbudget:.3f}')
-        print(f'\t Best Val. Loss: {best_valid_loss:.3f}')
-        print('-'*45)
+        # terminal plots saving
+        if eval_metric == 'loss':
+            if valid_loss < best_valid_loss:
+                if model_saving_path is not None:
+                    fig, axs = plt.subplots(1, 2, figsize = (10,3))
+                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0])
+                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1])
+                    axs[0].set_title('Scores Distribution on the Training Set')
+                    axs[1].set_title('Scores Distribution on the Validation Set')
+                    axs[0].axvline(threshold, c='r')
+                    axs[1].axvline(threshold, c='r')
+                    fig.savefig(f'{model_saving_path}/epoch_{epoch}_val_loss.jpg')
+                    plt.cla()
+                    # plt.show()
 
+        if eval_metric == 'aucpr':
+            if aucpr > best_aucpr:
+                if model_saving_path is not None:
+                    fig, axs = plt.subplots(1, 2, figsize = (10,3))
+                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0])
+                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1])
+                    axs[0].set_title('Scores Distribution on the Training Set')
+                    axs[1].set_title('Scores Distribution on the Validation Set')
+                    axs[0].axvline(threshold, c='r')
+                    axs[1].axvline(threshold, c='r')
+                    fig.savefig(f'{model_saving_path}/epoch_{epoch}_val_aucpr.jpg')
+                    plt.cla()
+                    # plt.show()
+
+        if eval_metric == 'rocauc':
+            if rocauc > best_rocauc:
+                if model_saving_path is not None:
+                    fig, axs = plt.subplots(1, 2, figsize = (10,3))
+                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0])
+                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1])
+                    axs[0].set_title('Scores Distribution on the Training Set')
+                    axs[1].set_title('Scores Distribution on the Validation Set')
+                    axs[0].axvline(threshold, c='r')
+                    axs[1].axvline(threshold, c='r')
+                    fig.savefig(f'{model_saving_path}/epoch_{epoch}_val_rocauc.jpg')
+                    plt.cla()
+                    # plt.show()
+
+        if eval_metric == 'recall_for_precision':
+            if recall_for_precision > best_recall_for_precision:
+                if model_saving_path is not None:
+                    fig, axs = plt.subplots(1, 2, figsize = (10,3))
+                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0])
+                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1])
+                    axs[0].set_title('Scores Distribution on the Training Set')
+                    axs[1].set_title('Scores Distribution on the Validation Set')
+                    axs[0].axvline(threshold, c='r')
+                    axs[1].axvline(threshold, c='r')
+                    fig.savefig(f'{model_saving_path}/epoch_{epoch}_val_recall_for_precision.jpg')
+                    plt.cla()
+
+
+        # update best values
+        if valid_loss < best_valid_loss:
+            best_valid_loss = valid_loss
+            
+            best_test_loss = test_loss
+            
+            # save if val_loss is criterion for saving
+            if eval_metric == 'loss':
+                if model_saving_path:
+                    torch.save(model.state_dict(), f'{model_saving_path}/model_val_loss.pt')
+
+        if aucpr > best_aucpr:
+            best_aucpr = aucpr
+            
+            if check_on_test:
+                best_test_aucpr = aucpr_test
+            
+            # save if val_loss is criterion for saving
+            if eval_metric == 'aucpr':
+                if model_saving_path:
+                    torch.save(model.state_dict(), f'{model_saving_path}/model_val_aucpr.pt')
+
+        if rocauc > best_rocauc:
+            best_rocauc = rocauc
+
+            if check_on_test:
+                best_test_rocauc = rocauc_test
+
+            # save if val_loss is criterion for saving
+            if eval_metric == 'rocauc':
+                if model_saving_path:
+                    torch.save(model.state_dict(), f'{model_saving_path}/model_val_rocauc.pt')
+
+        if recall_for_precision > best_recall_for_precision:
+            best_recall_for_precision = recall_for_precision
+            # save if val_loss is criterion for saving
+            if eval_metric == 'recall_for_precision':
+                if model_saving_path:
+                    torch.save(model.state_dict(), f'{model_saving_path}/model_val_recall_for_precision.pt')
+
+        if eval_metric == 'recall_for_precision':
+            if recall_for_precision == best_recall_for_precision:
+                best_value = best_recall_for_precision
+                update_about_it = True
+        if eval_metric == 'aucpr':
+            if aucpr == best_aucpr:
+                best_value = best_aucpr
+                update_about_it = True
+        if eval_metric == 'rocauc':
+            if rocauc == best_rocauc:
+                best_value = best_rocauc
+                update_about_it = True
+        if eval_metric == 'loss':
+            if valid_loss == best_valid_loss:
+                best_value = best_valid_loss
+                update_about_it = True
+        
+        # Summarize epoch results
+        logging.info('-'*45)
+        logging.info(f'Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s')
+        if update_about_it:
+            logging.info(f'\t New best val_rocauc loss was found, current best value is {np.round(best_value,5)}')
+            update_about_it = False
+        logging.info(f'\t Train Loss: {train_loss:.3f}')
+        logging.info(f'\t Val. Loss: {valid_loss:.3f}')
+        logging.info(f'\t ROC-AUC: {rocauc:.3f}')
+        logging.info(f'\t PR-AUC: {aucpr:.3f}')
+        logging.info(f'\t Best Val. Loss: {best_valid_loss:.3f}')
+        logging.info(f'\t Best ROC-AUC: {best_rocauc:.3f}')
+        logging.info(f'\t Best PR-AUC: {best_aucpr:.3f}')
+        if check_on_test:
+            logging.info(f'\t Test-ROC-AUC under Best Validation ROC-AUC: {best_test_rocauc:.3f}')
+            logging.info(f'\t Test-PR-AUC under Best Validation Best PR-AUC: {best_test_aucpr:.3f}')
+        
+        logging.info('-'*45)
+
+    # get best model
+    best_model = CombinedModel(upstream_model, downstream_model, device, continue_training_upstream_model, impute_only_missing)
+    best_model = best_model.to(device)
+    if eval_metric == 'recall_for_precision':
+        best_model.load_state_dict(torch.load(f'{model_saving_path}/model_val_recall_for_precision.pt'))
+    if eval_metric == 'aucpr':
+        best_model.load_state_dict(torch.load(f'{model_saving_path}/model_val_aucpr.pt'))
+    if eval_metric == 'rocauc':
+        best_model.load_state_dict(torch.load(f'{model_saving_path}/model_val_rocauc.pt'))
+    if eval_metric == 'loss':
+        best_model.load_state_dict(torch.load(f'{model_saving_path}/model_val_loss.pt'))
     
-    return best_aucper, rocauc_given_best_aucpr, tprforbudget_given_best_aucpr
+
+    # save additional plots
+    validation_data = pd.read_csv(metadata_file_path,index_col=0)
+    validation_data = validation_data[validation_data['sample'] == 'validation'].reset_index(drop=True)
+
+    # best_model = best_model.to('cpu')
+    predictions, nonmissing_leads = predict(
+        device = device,
+        readings= validation_data['reading'],
+        model = best_model,
+        data = validation_data,
+        targets=targets,
+        fillna=0,
+        leads = ['LI', 'LII', 'LIII', 'aVF', 'aVL', 'aVR','V1','V2','V3','V4','V5','V6'],
+        data_path=data_folder_path,
+    )
+
+
+    validation_data['y_pred'] = predictions
+    post_reg_analysis(
+        data = validation_data,
+        y_true_column=target_str,
+        y_pred_column='y_pred',
+        saving_path=model_saving_path
+    )
+
+    logging.shutdown()
+
+    if check_on_test:
+        return {'validation-roc-auc': best_rocauc, 'validation-auc-pr': best_aucpr, 'test-roc-auc': best_test_rocauc, 'test-auc-pr': best_test_aucpr}
+
+    else:
+        return {'roc-auc': best_rocauc, 'auc-pr': best_aucpr}
 
 
 
@@ -317,10 +500,8 @@ def run_experiments(other_vars, constants, variables):
             'patience':5,
             'clip':1,
             'impute_only_missing': True,
-            'minimal_number_of_leads': None,
             'leads': ['LI', 'LII', 'LIII', 'aVF', 'aVL', 'aVR','V1','V2','V3','V4','V5','V6'],
             'eval_metric': 'aucpr',
-            'minimal_number_of_leads': None,
         }
         variables = {
             'weight_decay': [0,0.0001,0.0005,0.001],
@@ -373,10 +554,8 @@ def run_experiments(other_vars, constants, variables):
         results['aucper'].append(best_aucper)
         results['rocauc'].append(rocauc_given_best_aucpr)
         results['tprforbudget_given_best_aucpr'].append(tprforbudget_given_best_aucpr)
-        
-        pd.DataFrame(results).to_csv(f'./combined_downstream_upstram/models/comined_model_training/notebook-{other_vars["notebook"]}/summary.csv')
-        
-        print('')
+
+        return results
 
 
 
@@ -404,8 +583,8 @@ def train_epoch(
 
     for i in t:
         # get data
-        X, y = next(it)
-        y=np.squeeze(y,-1)
+        X, y, _ = next(it)
+        # y=np.squeeze(y,-1)
 
         # don't run if there are NaNs
         if np.isnan(X).sum()>0:
@@ -466,15 +645,15 @@ def evaluate_epoch(model,
         for i in t:
 
             # get data
-            X, y = next(it)
-            y=np.squeeze(y,-1)
+            X, y, _ = next(it)
+            # y=np.squeeze(y,-1)
             
             # don't run if there are NaNs
             if np.isnan(X).sum()>0:
                 print('skipping because of NaNs')
                 continue
             y = np.float32(y)
-
+            
             X = process(X)    
             # X = torch.from_numpy(X)
             y = torch.from_numpy(y)

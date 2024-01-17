@@ -1,0 +1,1 @@
+python /home/david/Desktop/projects/thesis/combined_downstream_upstream/code/V5-different-seeds-on-test.py
