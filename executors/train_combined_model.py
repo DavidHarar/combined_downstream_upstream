@@ -228,8 +228,9 @@ def trainer(seed,                    # seed
         y_valication_prediction = pd.DataFrame({'y_val': y_val,
                                                'y_val_pred':y_val_pred})
         
-        y_test_prediction = pd.DataFrame({'y_test': y_test,
-                                               'y_test_pred':y_test_pred})
+        if check_on_test:
+            y_test_prediction = pd.DataFrame({'y_test': y_test,
+                                                'y_test_pred':y_test_pred})
                 
         # save loss
         if model_saving_path:
@@ -245,8 +246,9 @@ def trainer(seed,                    # seed
         recall_for_precision, threshold = MaxRecall_for_MinPrecision(y_val, y_val_pred, min_precision=0.4)
 
         # results on test
-        aucpr_test  = PRAUC(y_test, y_test_pred)
-        rocauc_test = ROCAUC(y_test, y_test_pred)
+        if check_on_test:
+            aucpr_test  = PRAUC(y_test, y_test_pred)
+            rocauc_test = ROCAUC(y_test, y_test_pred)
         
         # patience
         if eval_metric == 'loss':
@@ -337,7 +339,8 @@ def trainer(seed,                    # seed
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
             
-            best_test_loss = test_loss
+            if check_on_test:
+                best_test_loss = test_loss
             
             # save if val_loss is criterion for saving
             if eval_metric == 'loss':
