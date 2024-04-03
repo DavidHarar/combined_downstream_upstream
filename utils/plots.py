@@ -7,6 +7,12 @@ from downstream_classification.modeling.Inception import *
 import torch
 from tqdm import tqdm
 
+def process(X,device):
+    src_ = np.float32(np.transpose(X, axes=(2,0,1)))
+    src_ = torch.from_numpy(src_).to(device)
+    return src_
+
+
 def plot_roc_auc(y_pred, y_true,saving_path):
     from sklearn.metrics import roc_curve, auc
 
@@ -169,3 +175,53 @@ def post_reg_analysis(data, y_true_column, y_pred_column, saving_path):
     plt.xticks(rotation = 90)
     plt.savefig(f'{saving_path}/scores_boxes_by_age_window_hued_target.jpg')
     plt.clf()
+
+
+
+def plot_test_signals_12leads_SHL(model, 
+                                    test_generator, 
+                                    device, 
+                                    epoch,
+                                    plot_saving_path=None)->None:
+    """
+    Plot actual vs. predicted. Results are a plot of `2 x <num_plots>`, first column
+    contains plots of the source signals. Second column contains plots of the target
+    signals, and their prediction.
+    """
+
+    it = iter(test_generator)
+    X, _,_ = next(it)
+
+    # choose which signal from the first batch to look at
+    batch_size = X.shape[0]
+    src_ = process(X, device)  # np.float32(np.transpose(X, axes=(2,0,1)))->torch.todevice
+
+    # sig_to_plot = np.random.randint(0,batch_size,1) 
+    for sig_to_plot in range(30):
+        # fix shapes (convert into -> [length, batch_size, channels])
+        original = np.squeeze(src_[:,sig_to_plot,:]).T.detach().cpu().numpy()
+        
+        # predict and detach
+        reconstructed_batch = model(src_,None).detach().cpu().numpy()
+
+        # prep signals for presentation
+        reconstructed = np.squeeze(reconstructed_batch[:,sig_to_plot,:]).T
+
+        # plot
+        fig, axs = plt.subplots(6, 2, figsize = (20,20))
+
+        leads = ['LI', 'LII', 'LIII', 'aVF', 'aVL', 'aVR','V1','V2','V3','V4','V5','V6']
+        s=0
+
+        for ax in axs.flat:
+            ax.plot(original[s])
+            ax.plot(reconstructed[s])
+            ax.set_title(leads[s],fontsize=9)
+            s+=1
+
+        fig.suptitle('Blue-Original; Orange-Reconstructed')
+        plt.tight_layout()
+        if plot_saving_path:
+            plt.savefig(f'{plot_saving_path}/epoch_{epoch}_signal_num_{sig_to_plot}.png')
+        plt.show()
+

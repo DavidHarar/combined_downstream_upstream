@@ -11,6 +11,8 @@ from combined_downstream_upstream.modeling.JointModel import CombinedModel
 # from downstream_classification.dataloader.DataLoader import DataGenerator
 # from combined_downstream_upstram.modeling.JointModel import CombinedModel
 
+from combined_downstream_upstream.utils.plots import plot_test_signals_12leads_SHL
+
 
 import numpy as np
 import pandas as pd
@@ -58,6 +60,10 @@ def trainer(seed,                    # seed
             loss_function_weight = None,
 
             check_on_test = False,
+
+            # plot
+            plot=False,
+            plot_saving_path=None,
          ):
     """
     Train an experiment, save results optionally.
@@ -139,7 +145,7 @@ def trainer(seed,                    # seed
         sample='test',                                          # sample we want to create a generator to. Either train, validation or test
         targets=targets,                                        # list of targets we want train on
         batch_size=batch_size,                                  # batch size
-        shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
+        shuffle=False,                                            # Whether to shuffle the list of IDs at the end of each epoch.
         seed = seed
                                 )
     
@@ -215,7 +221,14 @@ def trainer(seed,                    # seed
                                 criterion, 
                                 device
                                 )
-        
+            
+            if plot:
+                plot_test_signals_12leads_SHL(model.upstream_model, 
+                                    test_generator, 
+                                    device, 
+                                    epoch,
+                                    plot_saving_path=f'{plot_saving_path}')
+                
         # store losses
         losses['train'].append(train_loss)
         losses['validation'].append(valid_loss)
