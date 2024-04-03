@@ -61,7 +61,7 @@ config = {
         'downstream_model':downstream_model,
         'impute_only_missing':False,
         'continue_training_upstream_model':True,
-        'model_saving_path':'./combined_downstream_upstream/models/AF-V5-one-seed-plot-on-test',
+        'model_saving_path':'./combined_downstream_upstream/models/AF-V5-one-seed-plot-on-test_again',
 
         # test
         'check_on_test':True,

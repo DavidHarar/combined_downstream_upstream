@@ -222,6 +222,6 @@ def plot_test_signals_12leads_SHL(model,
         fig.suptitle('Blue-Original; Orange-Reconstructed')
         plt.tight_layout()
         if plot_saving_path:
-            plt.savefig(f'{plot_saving_path}/epoch_{epoch}_signal_num_{sig_to_plot}.png')
+            plt.savefig(f'{plot_saving_path}/epoch_{epoch}_signal_num_{sig_to_plot}_again.png')
         plt.show()
 
