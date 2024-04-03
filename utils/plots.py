@@ -219,7 +219,7 @@ def plot_test_signals_12leads_SHL(model,
             ax.set_title(leads[s],fontsize=9)
             s+=1
 
-        fig.suptitle('Blue-Original; Orange-Reconstructed')
+        fig.suptitle(f'EPOCH {epoch} - Blue-Original; Orange-Reconstructed')
         plt.tight_layout()
         if plot_saving_path:
             plt.savefig(f'{plot_saving_path}/epoch_{epoch}_signal_num_{sig_to_plot}_again.png')
