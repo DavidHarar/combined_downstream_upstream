@@ -189,7 +189,15 @@ def trainer(seed,                    # seed
     losses = {'train':[],
               'validation':[]}
 
-    
+    # plot before fine-tuning
+    if plot:
+        plot_test_signals_12leads_SHL(model.upstream_model, 
+                            test_generator, 
+                            device, 
+                            0,
+                            plot_saving_path=f'{plot_saving_path}')
+
+
     # Training loop
     for epoch in range(n_epochs):
         
@@ -222,12 +230,12 @@ def trainer(seed,                    # seed
                                 device
                                 )
             
-            if plot:
-                plot_test_signals_12leads_SHL(model.upstream_model, 
-                                    test_generator, 
-                                    device, 
-                                    epoch,
-                                    plot_saving_path=f'{plot_saving_path}')
+        if plot:
+            plot_test_signals_12leads_SHL(model.upstream_model, 
+                                test_generator, 
+                                device, 
+                                epoch+1,
+                                plot_saving_path=f'{plot_saving_path}')
                 
         # store losses
         losses['train'].append(train_loss)
