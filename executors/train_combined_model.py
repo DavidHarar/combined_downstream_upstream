@@ -59,6 +59,8 @@ def trainer(seed,                    # seed
             patience=np.inf,
             loss_function_weight = None,
 
+            reconstruction_loss_weight = 0,
+
             check_on_test = False,
 
             # plot
@@ -160,12 +162,14 @@ def trainer(seed,                    # seed
 
 
     if len(targets)>1:
-        criterion = nn.CrossEntropyLoss()
+        classification_criterion = nn.CrossEntropyLoss()        
     else:
         if loss_function_weight:
-            criterion = nn.BCELoss(loss_function_weight)
+            classification_criterion = nn.BCELoss(loss_function_weight)
+            reconstruction_criterion = nn.MSELoss(loss_function_weight)
         else: 
-            criterion = nn.BCELoss()
+            classification_criterion = nn.BCELoss()
+            reconstruction_criterion = nn.MSELoss()
 
     logging.info(f'The model has {count_parameters(model):,} trainable parameters')
     logging.info('* Model:')
@@ -209,25 +213,31 @@ def trainer(seed,                    # seed
         train_loss, y_train, y_train_pred = train_epoch(model, 
                            train_generator, 
                            optimizer, 
-                           criterion, 
+                           classification_criterion, 
                            clip, 
-                           device
-                           )
+                           device,
+                           reconstruction_criterion,
+                           reconstruction_loss_weight
+                           )        
         
 
         # evaluate
         valid_loss, y_val, y_val_pred = evaluate_epoch(model, 
                               validation_generator, 
-                              criterion, 
-                              device
-                              )
+                              classification_criterion, 
+                              device,
+                              reconstruction_criterion,
+                              reconstruction_loss_weight
+                           )
         
         # test
         if check_on_test:
             test_loss, y_test, y_test_pred = evaluate_epoch(model, 
                                 test_generator, 
-                                criterion, 
-                                device
+                                classification_criterion, 
+                                device,
+                                reconstruction_criterion,
+                                reconstruction_loss_weight
                                 )
             
         if plot:
@@ -587,10 +597,13 @@ def train_epoch(
         model, 
         iterator, 
         optimizer, 
-        criterion, 
+        classification_criterion, 
         clip, 
         device, 
-          ):
+
+        reconstruction_criterion = None,
+        reconstruction_loss_weight = 0
+        ):
     
     # set model on training state and init epoch loss    
     model.train()
@@ -626,7 +639,17 @@ def train_epoch(
         # step
         optimizer.zero_grad()
         output = model(X)
-        loss = criterion(output, y)
+        reconstruction_X = model.upstream_model(X, None)
+
+        # get reconstruction loss
+        X_perm = X.permute((1,2,0)) # [450, 128, 12] ->[128,12,450]
+        reconstruction_X = reconstruction_X.permute((1,2,0))
+        non_zero_mask = X_perm.abs().sum(dim=-1) != 0
+        filtered_output = X_perm[non_zero_mask]
+        filtered_target = reconstruction_X[non_zero_mask]
+
+        loss = (1 - reconstruction_loss_weight) * classification_criterion(output, y) + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
+        
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
         optimizer.step()
@@ -647,8 +670,11 @@ def train_epoch(
 
 def evaluate_epoch(model, 
                    iterator, 
-                   criterion,
-                   device):
+                   classification_criterion,
+                   device,
+                   reconstruction_criterion,
+                   reconstruction_loss_weight,
+                   ):
     
     # set model on training state and init epoch loss    
     model.eval()
@@ -685,8 +711,18 @@ def evaluate_epoch(model,
             X = X.to(device)
             y = y.to(device)
             
+
             output = model(X)
-            loss = criterion(output, y)
+            reconstruction_X = model.upstream_model(X,None)
+
+            # get reconstruction loss
+            X_perm = X.permute((1,2,0)) # [450, 128, 12] ->[128,12,450]
+            reconstruction_X = reconstruction_X.permute((1,2,0))
+            non_zero_mask = X_perm.abs().sum(dim=-1) != 0
+            filtered_output = X_perm[non_zero_mask]
+            filtered_target = reconstruction_X[non_zero_mask]
+
+            loss = (1 - reconstruction_loss_weight) * classification_criterion(output, y) + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
             epoch_loss += loss.item()
 
             j = np.round(epoch_loss/(i+1),5)
