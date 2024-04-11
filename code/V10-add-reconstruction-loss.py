@@ -66,14 +66,14 @@ for seed_ in seeds:
             'downstream_model':downstream_model,
             'impute_only_missing':False,
             'continue_training_upstream_model':True,
-            'model_saving_path':'./combined_downstream_upstream/models/AF-V10-different-seeds',
+            'model_saving_path':'./combined_downstream_upstream/models/AF-V10-different-seeds-again2',
 
             'reconstruction_loss_weight':0.5,
 
             # test
             'check_on_test':True,
-            'plot':True,
-            'plot_saving_path':'/home/david/Desktop/projects/thesis/combined_downstream_upstream/plots/V10/',
+            # 'plot':True,
+            # 'plot_saving_path':'/home/david/Desktop/projects/thesis/combined_downstream_upstream/plots/V10/',
 
             }
 
