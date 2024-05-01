@@ -1,3 +1,5 @@
+from typing import List
+
 import pickle
 
 import torch
@@ -216,8 +218,9 @@ def trainer(seed,                    # seed
                            classification_criterion, 
                            clip, 
                            device,
+                           epoch,
                            reconstruction_criterion,
-                           reconstruction_loss_weight
+                           reconstruction_loss_weight,
                            )        
         
 
@@ -226,8 +229,9 @@ def trainer(seed,                    # seed
                               validation_generator, 
                               classification_criterion, 
                               device,
+                              epoch,
                               reconstruction_criterion,
-                              reconstruction_loss_weight
+                              reconstruction_loss_weight,
                            )
         
         # test
@@ -236,8 +240,9 @@ def trainer(seed,                    # seed
                                 test_generator, 
                                 classification_criterion, 
                                 device,
+                                epoch,
                                 reconstruction_criterion,
-                                reconstruction_loss_weight
+                                reconstruction_loss_weight,
                                 )
             
         if plot:
@@ -600,9 +605,9 @@ def train_epoch(
         classification_criterion, 
         clip, 
         device, 
-
+        epoch,
         reconstruction_criterion = None,
-        reconstruction_loss_weight = 0
+        reconstruction_loss_weight = 0,
         ):
     
     # set model on training state and init epoch loss    
@@ -648,8 +653,13 @@ def train_epoch(
         filtered_output = X_perm[non_zero_mask]
         filtered_target = reconstruction_X[non_zero_mask]
 
-        loss = (1 - reconstruction_loss_weight) * classification_criterion(output, y) + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
-        
+
+        # get current relevant loss
+        if not isinstance(reconstruction_loss_weight, List):
+            loss = (1 - reconstruction_loss_weight) * classification_criterion(output, y) + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
+        else:
+            loss = (1 - reconstruction_loss_weight[epoch]) * classification_criterion(output, y) + reconstruction_loss_weight[epoch] * reconstruction_criterion(filtered_target, filtered_output)
+
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
         optimizer.step()
@@ -672,6 +682,7 @@ def evaluate_epoch(model,
                    iterator, 
                    classification_criterion,
                    device,
+                   epoch,
                    reconstruction_criterion,
                    reconstruction_loss_weight,
                    ):
@@ -721,8 +732,13 @@ def evaluate_epoch(model,
             non_zero_mask = X_perm.abs().sum(dim=-1) != 0
             filtered_output = X_perm[non_zero_mask]
             filtered_target = reconstruction_X[non_zero_mask]
+            
+            # get current relevant loss
+            if not isinstance(reconstruction_loss_weight, List):
+                loss = (1 - reconstruction_loss_weight) * classification_criterion(output, y) + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
+            else:
+                loss = (1 - reconstruction_loss_weight[epoch]) * classification_criterion(output, y) + reconstruction_loss_weight[epoch] * reconstruction_criterion(filtered_target, filtered_output)
 
-            loss = (1 - reconstruction_loss_weight) * classification_criterion(output, y) + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
             epoch_loss += loss.item()
 
             j = np.round(epoch_loss/(i+1),5)

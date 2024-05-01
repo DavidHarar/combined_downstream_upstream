@@ -1,0 +1,1 @@
+python /home/david/Desktop/projects/thesis/combined_downstream_upstream/code/V11-add-reconstruction-loss-3-epochs-only-reconstruction-loss-then20pct.py
