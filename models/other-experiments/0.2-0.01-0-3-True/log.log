@@ -1,0 +1,2339 @@
+2024-10-05 23:28 - INFO - Fit the preprocessing pipeline
+2024-10-05 23:28 - INFO - Training using device: cuda
+2024-10-05 23:28 - INFO - Creating generators
+2024-10-05 23:28 - INFO - The model has 2,246,929 trainable parameters
+2024-10-05 23:28 - INFO - * Model:
+2024-10-05 23:28 - INFO - * -----------
+2024-10-05 23:28 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-05 23:28 - INFO - * -----------
+2024-10-06 00:01 - INFO - ---------------------------------------------
+2024-10-06 00:01 - INFO - Epoch: 01 | Time: 33m 1s
+2024-10-06 00:01 - INFO - 	 New best val_rocauc loss was found, current best value is 0.30487
+2024-10-06 00:01 - INFO - 	 Train Loss: 0.840
+2024-10-06 00:01 - INFO - 	 Val. Loss: 0.827
+2024-10-06 00:01 - INFO - 	 ROC-AUC: 0.578
+2024-10-06 00:01 - INFO - 	 PR-AUC: 0.305
+2024-10-06 00:01 - INFO - 	 Best Val. Loss: 0.827
+2024-10-06 00:01 - INFO - 	 Best ROC-AUC: 0.578
+2024-10-06 00:01 - INFO - 	 Best PR-AUC: 0.305
+2024-10-06 00:01 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.535
+2024-10-06 00:01 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.282
+2024-10-06 00:01 - INFO - ---------------------------------------------
+2024-10-06 00:34 - INFO - ---------------------------------------------
+2024-10-06 00:34 - INFO - Epoch: 02 | Time: 32m 47s
+2024-10-06 00:34 - INFO - 	 New best val_rocauc loss was found, current best value is 0.40766
+2024-10-06 00:34 - INFO - 	 Train Loss: 0.812
+2024-10-06 00:34 - INFO - 	 Val. Loss: 0.776
+2024-10-06 00:34 - INFO - 	 ROC-AUC: 0.692
+2024-10-06 00:34 - INFO - 	 PR-AUC: 0.408
+2024-10-06 00:34 - INFO - 	 Best Val. Loss: 0.776
+2024-10-06 00:34 - INFO - 	 Best ROC-AUC: 0.692
+2024-10-06 00:34 - INFO - 	 Best PR-AUC: 0.408
+2024-10-06 00:34 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.660
+2024-10-06 00:34 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.379
+2024-10-06 00:34 - INFO - ---------------------------------------------
+2024-10-06 01:07 - INFO - ---------------------------------------------
+2024-10-06 01:07 - INFO - Epoch: 03 | Time: 33m 34s
+2024-10-06 01:07 - INFO - 	 New best val_rocauc loss was found, current best value is 0.42384
+2024-10-06 01:07 - INFO - 	 Train Loss: 0.778
+2024-10-06 01:07 - INFO - 	 Val. Loss: 0.761
+2024-10-06 01:07 - INFO - 	 ROC-AUC: 0.706
+2024-10-06 01:07 - INFO - 	 PR-AUC: 0.424
+2024-10-06 01:07 - INFO - 	 Best Val. Loss: 0.761
+2024-10-06 01:07 - INFO - 	 Best ROC-AUC: 0.706
+2024-10-06 01:07 - INFO - 	 Best PR-AUC: 0.424
+2024-10-06 01:07 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.676
+2024-10-06 01:07 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.392
+2024-10-06 01:07 - INFO - ---------------------------------------------
+2024-10-06 01:40 - INFO - ---------------------------------------------
+2024-10-06 01:40 - INFO - Epoch: 04 | Time: 32m 34s
+2024-10-06 01:40 - INFO - 	 New best val_rocauc loss was found, current best value is 0.43614
+2024-10-06 01:40 - INFO - 	 Train Loss: 0.755
+2024-10-06 01:40 - INFO - 	 Val. Loss: 0.747
+2024-10-06 01:40 - INFO - 	 ROC-AUC: 0.722
+2024-10-06 01:40 - INFO - 	 PR-AUC: 0.436
+2024-10-06 01:40 - INFO - 	 Best Val. Loss: 0.747
+2024-10-06 01:40 - INFO - 	 Best ROC-AUC: 0.722
+2024-10-06 01:40 - INFO - 	 Best PR-AUC: 0.436
+2024-10-06 01:40 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.693
+2024-10-06 01:40 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.416
+2024-10-06 01:40 - INFO - ---------------------------------------------
+2024-10-06 02:12 - INFO - ---------------------------------------------
+2024-10-06 02:12 - INFO - Epoch: 05 | Time: 32m 39s
+2024-10-06 02:12 - INFO - 	 Train Loss: 0.744
+2024-10-06 02:12 - INFO - 	 Val. Loss: 0.754
+2024-10-06 02:12 - INFO - 	 ROC-AUC: 0.722
+2024-10-06 02:12 - INFO - 	 PR-AUC: 0.433
+2024-10-06 02:12 - INFO - 	 Best Val. Loss: 0.747
+2024-10-06 02:12 - INFO - 	 Best ROC-AUC: 0.722
+2024-10-06 02:12 - INFO - 	 Best PR-AUC: 0.436
+2024-10-06 02:12 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.700
+2024-10-06 02:12 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.416
+2024-10-06 02:12 - INFO - ---------------------------------------------
+2024-10-06 02:46 - INFO - ---------------------------------------------
+2024-10-06 02:46 - INFO - Epoch: 06 | Time: 33m 13s
+2024-10-06 02:46 - INFO - 	 New best val_rocauc loss was found, current best value is 0.43926
+2024-10-06 02:46 - INFO - 	 Train Loss: 0.737
+2024-10-06 02:46 - INFO - 	 Val. Loss: 0.742
+2024-10-06 02:46 - INFO - 	 ROC-AUC: 0.728
+2024-10-06 02:46 - INFO - 	 PR-AUC: 0.439
+2024-10-06 02:46 - INFO - 	 Best Val. Loss: 0.742
+2024-10-06 02:46 - INFO - 	 Best ROC-AUC: 0.728
+2024-10-06 02:46 - INFO - 	 Best PR-AUC: 0.439
+2024-10-06 02:46 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.702
+2024-10-06 02:46 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.425
+2024-10-06 02:46 - INFO - ---------------------------------------------
+2024-10-06 03:18 - INFO - ---------------------------------------------
+2024-10-06 03:18 - INFO - Epoch: 07 | Time: 32m 38s
+2024-10-06 03:18 - INFO - 	 Train Loss: 0.732
+2024-10-06 03:18 - INFO - 	 Val. Loss: 0.742
+2024-10-06 03:18 - INFO - 	 ROC-AUC: 0.728
+2024-10-06 03:18 - INFO - 	 PR-AUC: 0.437
+2024-10-06 03:18 - INFO - 	 Best Val. Loss: 0.742
+2024-10-06 03:18 - INFO - 	 Best ROC-AUC: 0.728
+2024-10-06 03:18 - INFO - 	 Best PR-AUC: 0.439
+2024-10-06 03:18 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.702
+2024-10-06 03:18 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.425
+2024-10-06 03:18 - INFO - ---------------------------------------------
+2024-10-06 03:25 - INFO - Fit the preprocessing pipeline
+2024-10-06 03:25 - INFO - Training using device: cuda
+2024-10-06 03:25 - INFO - Creating generators
+2024-10-06 03:25 - INFO - The model has 2,246,929 trainable parameters
+2024-10-06 03:25 - INFO - * Model:
+2024-10-06 03:25 - INFO - * -----------
+2024-10-06 03:25 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-06 03:25 - INFO - * -----------
+2024-10-06 04:11 - INFO - ---------------------------------------------
+2024-10-06 04:11 - INFO - Epoch: 01 | Time: 45m 34s
+2024-10-06 04:11 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 04:11 - INFO - 	 Train Loss: 0.848
+2024-10-06 04:11 - INFO - 	 Val. Loss: 0.837
+2024-10-06 04:11 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 04:11 - INFO - 	 PR-AUC: 0.621
+2024-10-06 04:11 - INFO - 	 Best Val. Loss: 0.837
+2024-10-06 04:11 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 04:11 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 04:11 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 04:11 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 04:11 - INFO - ---------------------------------------------
+2024-10-06 04:57 - INFO - ---------------------------------------------
+2024-10-06 04:57 - INFO - Epoch: 02 | Time: 45m 58s
+2024-10-06 04:57 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 04:57 - INFO - 	 Train Loss: 0.847
+2024-10-06 04:57 - INFO - 	 Val. Loss: 0.837
+2024-10-06 04:57 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 04:57 - INFO - 	 PR-AUC: 0.621
+2024-10-06 04:57 - INFO - 	 Best Val. Loss: 0.837
+2024-10-06 04:57 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 04:57 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 04:57 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 04:57 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 04:57 - INFO - ---------------------------------------------
+2024-10-06 05:42 - INFO - ---------------------------------------------
+2024-10-06 05:42 - INFO - Epoch: 03 | Time: 45m 30s
+2024-10-06 05:42 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 05:42 - INFO - 	 Train Loss: 0.847
+2024-10-06 05:42 - INFO - 	 Val. Loss: 0.837
+2024-10-06 05:42 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 05:42 - INFO - 	 PR-AUC: 0.621
+2024-10-06 05:42 - INFO - 	 Best Val. Loss: 0.837
+2024-10-06 05:42 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 05:42 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 05:42 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 05:42 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 05:42 - INFO - ---------------------------------------------
+2024-10-06 06:35 - INFO - Fit the preprocessing pipeline
+2024-10-06 06:35 - INFO - Training using device: cuda
+2024-10-06 06:35 - INFO - Creating generators
+2024-10-06 06:36 - INFO - The model has 2,246,929 trainable parameters
+2024-10-06 06:36 - INFO - * Model:
+2024-10-06 06:36 - INFO - * -----------
+2024-10-06 06:36 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-06 06:36 - INFO - * -----------
+2024-10-06 07:09 - INFO - ---------------------------------------------
+2024-10-06 07:09 - INFO - Epoch: 01 | Time: 32m 58s
+2024-10-06 07:09 - INFO - 	 New best val_rocauc loss was found, current best value is 0.43768
+2024-10-06 07:09 - INFO - 	 Train Loss: 0.935
+2024-10-06 07:09 - INFO - 	 Val. Loss: 0.947
+2024-10-06 07:09 - INFO - 	 ROC-AUC: 0.729
+2024-10-06 07:09 - INFO - 	 PR-AUC: 0.438
+2024-10-06 07:09 - INFO - 	 Best Val. Loss: 0.947
+2024-10-06 07:09 - INFO - 	 Best ROC-AUC: 0.729
+2024-10-06 07:09 - INFO - 	 Best PR-AUC: 0.438
+2024-10-06 07:09 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.706
+2024-10-06 07:09 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.433
+2024-10-06 07:09 - INFO - ---------------------------------------------
+2024-10-06 07:41 - INFO - ---------------------------------------------
+2024-10-06 07:41 - INFO - Epoch: 02 | Time: 32m 48s
+2024-10-06 07:41 - INFO - 	 Train Loss: 0.926
+2024-10-06 07:41 - INFO - 	 Val. Loss: 0.943
+2024-10-06 07:41 - INFO - 	 ROC-AUC: 0.729
+2024-10-06 07:41 - INFO - 	 PR-AUC: 0.436
+2024-10-06 07:41 - INFO - 	 Best Val. Loss: 0.943
+2024-10-06 07:41 - INFO - 	 Best ROC-AUC: 0.729
+2024-10-06 07:41 - INFO - 	 Best PR-AUC: 0.438
+2024-10-06 07:41 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.704
+2024-10-06 07:41 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.433
+2024-10-06 07:41 - INFO - ---------------------------------------------
+2024-10-06 08:14 - INFO - ---------------------------------------------
+2024-10-06 08:14 - INFO - Epoch: 03 | Time: 32m 56s
+2024-10-06 08:14 - INFO - 	 Train Loss: 0.921
+2024-10-06 08:14 - INFO - 	 Val. Loss: 0.943
+2024-10-06 08:14 - INFO - 	 ROC-AUC: 0.728
+2024-10-06 08:14 - INFO - 	 PR-AUC: 0.433
+2024-10-06 08:14 - INFO - 	 Best Val. Loss: 0.943
+2024-10-06 08:14 - INFO - 	 Best ROC-AUC: 0.729
+2024-10-06 08:14 - INFO - 	 Best PR-AUC: 0.438
+2024-10-06 08:14 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.704
+2024-10-06 08:14 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.433
+2024-10-06 08:14 - INFO - ---------------------------------------------
+2024-10-06 08:47 - INFO - ---------------------------------------------
+2024-10-06 08:47 - INFO - Epoch: 04 | Time: 32m 51s
+2024-10-06 08:47 - INFO - 	 New best val_rocauc loss was found, current best value is 0.43772
+2024-10-06 08:47 - INFO - 	 Train Loss: 0.918
+2024-10-06 08:47 - INFO - 	 Val. Loss: 0.942
+2024-10-06 08:47 - INFO - 	 ROC-AUC: 0.729
+2024-10-06 08:47 - INFO - 	 PR-AUC: 0.438
+2024-10-06 08:47 - INFO - 	 Best Val. Loss: 0.942
+2024-10-06 08:47 - INFO - 	 Best ROC-AUC: 0.729
+2024-10-06 08:47 - INFO - 	 Best PR-AUC: 0.438
+2024-10-06 08:47 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.704
+2024-10-06 08:47 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.431
+2024-10-06 08:47 - INFO - ---------------------------------------------
+2024-10-06 09:20 - INFO - ---------------------------------------------
+2024-10-06 09:20 - INFO - Epoch: 05 | Time: 32m 55s
+2024-10-06 09:20 - INFO - 	 Train Loss: 0.914
+2024-10-06 09:20 - INFO - 	 Val. Loss: 0.941
+2024-10-06 09:20 - INFO - 	 ROC-AUC: 0.730
+2024-10-06 09:20 - INFO - 	 PR-AUC: 0.436
+2024-10-06 09:20 - INFO - 	 Best Val. Loss: 0.941
+2024-10-06 09:20 - INFO - 	 Best ROC-AUC: 0.730
+2024-10-06 09:20 - INFO - 	 Best PR-AUC: 0.438
+2024-10-06 09:20 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.713
+2024-10-06 09:20 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.431
+2024-10-06 09:20 - INFO - ---------------------------------------------
+2024-10-06 09:53 - INFO - ---------------------------------------------
+2024-10-06 09:53 - INFO - Epoch: 06 | Time: 32m 32s
+2024-10-06 09:53 - INFO - 	 New best val_rocauc loss was found, current best value is 0.44047
+2024-10-06 09:53 - INFO - 	 Train Loss: 0.912
+2024-10-06 09:53 - INFO - 	 Val. Loss: 0.937
+2024-10-06 09:53 - INFO - 	 ROC-AUC: 0.733
+2024-10-06 09:53 - INFO - 	 PR-AUC: 0.440
+2024-10-06 09:53 - INFO - 	 Best Val. Loss: 0.937
+2024-10-06 09:53 - INFO - 	 Best ROC-AUC: 0.733
+2024-10-06 09:53 - INFO - 	 Best PR-AUC: 0.440
+2024-10-06 09:53 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 09:53 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.435
+2024-10-06 09:53 - INFO - ---------------------------------------------
+2024-10-06 10:26 - INFO - ---------------------------------------------
+2024-10-06 10:26 - INFO - Epoch: 07 | Time: 33m 28s
+2024-10-06 10:26 - INFO - 	 Train Loss: 0.908
+2024-10-06 10:26 - INFO - 	 Val. Loss: 0.939
+2024-10-06 10:26 - INFO - 	 ROC-AUC: 0.732
+2024-10-06 10:26 - INFO - 	 PR-AUC: 0.437
+2024-10-06 10:26 - INFO - 	 Best Val. Loss: 0.937
+2024-10-06 10:26 - INFO - 	 Best ROC-AUC: 0.733
+2024-10-06 10:26 - INFO - 	 Best PR-AUC: 0.440
+2024-10-06 10:26 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 10:26 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.435
+2024-10-06 10:26 - INFO - ---------------------------------------------
+2024-10-06 10:33 - INFO - Fit the preprocessing pipeline
+2024-10-06 10:33 - INFO - Training using device: cuda
+2024-10-06 10:33 - INFO - Creating generators
+2024-10-06 10:33 - INFO - The model has 2,246,929 trainable parameters
+2024-10-06 10:33 - INFO - * Model:
+2024-10-06 10:33 - INFO - * -----------
+2024-10-06 10:33 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-06 10:33 - INFO - * -----------
+2024-10-06 11:18 - INFO - ---------------------------------------------
+2024-10-06 11:18 - INFO - Epoch: 01 | Time: 45m 42s
+2024-10-06 11:18 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 11:18 - INFO - 	 Train Loss: 1.075
+2024-10-06 11:18 - INFO - 	 Val. Loss: 1.064
+2024-10-06 11:18 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 11:18 - INFO - 	 PR-AUC: 0.621
+2024-10-06 11:18 - INFO - 	 Best Val. Loss: 1.064
+2024-10-06 11:18 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 11:18 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 11:18 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 11:18 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 11:18 - INFO - ---------------------------------------------
+2024-10-06 12:04 - INFO - ---------------------------------------------
+2024-10-06 12:04 - INFO - Epoch: 02 | Time: 45m 7s
+2024-10-06 12:04 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 12:04 - INFO - 	 Train Loss: 1.074
+2024-10-06 12:04 - INFO - 	 Val. Loss: 1.064
+2024-10-06 12:04 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 12:04 - INFO - 	 PR-AUC: 0.621
+2024-10-06 12:04 - INFO - 	 Best Val. Loss: 1.064
+2024-10-06 12:04 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 12:04 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 12:04 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 12:04 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 12:04 - INFO - ---------------------------------------------
+2024-10-06 12:48 - INFO - ---------------------------------------------
+2024-10-06 12:48 - INFO - Epoch: 03 | Time: 44m 56s
+2024-10-06 12:48 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 12:48 - INFO - 	 Train Loss: 1.074
+2024-10-06 12:48 - INFO - 	 Val. Loss: 1.064
+2024-10-06 12:48 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 12:48 - INFO - 	 PR-AUC: 0.621
+2024-10-06 12:48 - INFO - 	 Best Val. Loss: 1.064
+2024-10-06 12:48 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 12:48 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 12:48 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 12:48 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 12:48 - INFO - ---------------------------------------------
+2024-10-06 13:40 - INFO - Fit the preprocessing pipeline
+2024-10-06 13:40 - INFO - Training using device: cuda
+2024-10-06 13:40 - INFO - Creating generators
+2024-10-06 13:40 - INFO - The model has 2,246,929 trainable parameters
+2024-10-06 13:40 - INFO - * Model:
+2024-10-06 13:40 - INFO - * -----------
+2024-10-06 13:40 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-06 13:40 - INFO - * -----------
+2024-10-06 14:13 - INFO - ---------------------------------------------
+2024-10-06 14:13 - INFO - Epoch: 01 | Time: 32m 21s
+2024-10-06 14:13 - INFO - 	 New best val_rocauc loss was found, current best value is 0.4346
+2024-10-06 14:13 - INFO - 	 Train Loss: 1.222
+2024-10-06 14:13 - INFO - 	 Val. Loss: 1.253
+2024-10-06 14:13 - INFO - 	 ROC-AUC: 0.730
+2024-10-06 14:13 - INFO - 	 PR-AUC: 0.435
+2024-10-06 14:13 - INFO - 	 Best Val. Loss: 1.253
+2024-10-06 14:13 - INFO - 	 Best ROC-AUC: 0.730
+2024-10-06 14:13 - INFO - 	 Best PR-AUC: 0.435
+2024-10-06 14:13 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 14:13 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.434
+2024-10-06 14:13 - INFO - ---------------------------------------------
+2024-10-06 14:45 - INFO - ---------------------------------------------
+2024-10-06 14:45 - INFO - Epoch: 02 | Time: 32m 31s
+2024-10-06 14:45 - INFO - 	 Train Loss: 1.211
+2024-10-06 14:45 - INFO - 	 Val. Loss: 1.255
+2024-10-06 14:45 - INFO - 	 ROC-AUC: 0.729
+2024-10-06 14:45 - INFO - 	 PR-AUC: 0.431
+2024-10-06 14:45 - INFO - 	 Best Val. Loss: 1.253
+2024-10-06 14:45 - INFO - 	 Best ROC-AUC: 0.730
+2024-10-06 14:45 - INFO - 	 Best PR-AUC: 0.435
+2024-10-06 14:45 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 14:45 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.434
+2024-10-06 14:45 - INFO - ---------------------------------------------
+2024-10-06 15:17 - INFO - ---------------------------------------------
+2024-10-06 15:17 - INFO - Epoch: 03 | Time: 31m 59s
+2024-10-06 15:17 - INFO - 	 Train Loss: 1.206
+2024-10-06 15:17 - INFO - 	 Val. Loss: 1.263
+2024-10-06 15:17 - INFO - 	 ROC-AUC: 0.728
+2024-10-06 15:17 - INFO - 	 PR-AUC: 0.431
+2024-10-06 15:17 - INFO - 	 Best Val. Loss: 1.253
+2024-10-06 15:17 - INFO - 	 Best ROC-AUC: 0.730
+2024-10-06 15:17 - INFO - 	 Best PR-AUC: 0.435
+2024-10-06 15:17 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 15:17 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.434
+2024-10-06 15:17 - INFO - ---------------------------------------------
+2024-10-06 15:49 - INFO - ---------------------------------------------
+2024-10-06 15:49 - INFO - Epoch: 04 | Time: 32m 10s
+2024-10-06 15:49 - INFO - 	 New best val_rocauc loss was found, current best value is 0.43716
+2024-10-06 15:49 - INFO - 	 Train Loss: 1.204
+2024-10-06 15:49 - INFO - 	 Val. Loss: 1.257
+2024-10-06 15:49 - INFO - 	 ROC-AUC: 0.732
+2024-10-06 15:49 - INFO - 	 PR-AUC: 0.437
+2024-10-06 15:49 - INFO - 	 Best Val. Loss: 1.253
+2024-10-06 15:49 - INFO - 	 Best ROC-AUC: 0.732
+2024-10-06 15:49 - INFO - 	 Best PR-AUC: 0.437
+2024-10-06 15:49 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 15:49 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.433
+2024-10-06 15:49 - INFO - ---------------------------------------------
+2024-10-06 16:22 - INFO - ---------------------------------------------
+2024-10-06 16:22 - INFO - Epoch: 05 | Time: 32m 8s
+2024-10-06 16:22 - INFO - 	 Train Loss: 1.201
+2024-10-06 16:22 - INFO - 	 Val. Loss: 1.264
+2024-10-06 16:22 - INFO - 	 ROC-AUC: 0.729
+2024-10-06 16:22 - INFO - 	 PR-AUC: 0.432
+2024-10-06 16:22 - INFO - 	 Best Val. Loss: 1.253
+2024-10-06 16:22 - INFO - 	 Best ROC-AUC: 0.732
+2024-10-06 16:22 - INFO - 	 Best PR-AUC: 0.437
+2024-10-06 16:22 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 16:22 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.433
+2024-10-06 16:22 - INFO - ---------------------------------------------
+2024-10-06 16:54 - INFO - ---------------------------------------------
+2024-10-06 16:54 - INFO - Epoch: 06 | Time: 32m 1s
+2024-10-06 16:54 - INFO - 	 New best val_rocauc loss was found, current best value is 0.43849
+2024-10-06 16:54 - INFO - 	 Train Loss: 1.198
+2024-10-06 16:54 - INFO - 	 Val. Loss: 1.259
+2024-10-06 16:54 - INFO - 	 ROC-AUC: 0.732
+2024-10-06 16:54 - INFO - 	 PR-AUC: 0.438
+2024-10-06 16:54 - INFO - 	 Best Val. Loss: 1.253
+2024-10-06 16:54 - INFO - 	 Best ROC-AUC: 0.732
+2024-10-06 16:54 - INFO - 	 Best PR-AUC: 0.438
+2024-10-06 16:54 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 16:54 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.437
+2024-10-06 16:54 - INFO - ---------------------------------------------
+2024-10-06 17:26 - INFO - ---------------------------------------------
+2024-10-06 17:26 - INFO - Epoch: 07 | Time: 32m 34s
+2024-10-06 17:26 - INFO - 	 Train Loss: 1.196
+2024-10-06 17:26 - INFO - 	 Val. Loss: 1.262
+2024-10-06 17:26 - INFO - 	 ROC-AUC: 0.728
+2024-10-06 17:26 - INFO - 	 PR-AUC: 0.429
+2024-10-06 17:26 - INFO - 	 Best Val. Loss: 1.253
+2024-10-06 17:26 - INFO - 	 Best ROC-AUC: 0.732
+2024-10-06 17:26 - INFO - 	 Best PR-AUC: 0.438
+2024-10-06 17:26 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.711
+2024-10-06 17:26 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.437
+2024-10-06 17:26 - INFO - ---------------------------------------------
+2024-10-06 17:33 - INFO - Fit the preprocessing pipeline
+2024-10-06 17:33 - INFO - Training using device: cuda
+2024-10-06 17:33 - INFO - Creating generators
+2024-10-06 17:33 - INFO - The model has 2,246,929 trainable parameters
+2024-10-06 17:33 - INFO - * Model:
+2024-10-06 17:33 - INFO - * -----------
+2024-10-06 17:33 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-06 17:33 - INFO - * -----------
+2024-10-06 18:18 - INFO - ---------------------------------------------
+2024-10-06 18:18 - INFO - Epoch: 01 | Time: 45m 16s
+2024-10-06 18:18 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 18:18 - INFO - 	 Train Loss: 1.421
+2024-10-06 18:18 - INFO - 	 Val. Loss: 1.411
+2024-10-06 18:18 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 18:18 - INFO - 	 PR-AUC: 0.621
+2024-10-06 18:18 - INFO - 	 Best Val. Loss: 1.411
+2024-10-06 18:18 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 18:18 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 18:18 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 18:18 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 18:18 - INFO - ---------------------------------------------
+2024-10-06 19:03 - INFO - ---------------------------------------------
+2024-10-06 19:03 - INFO - Epoch: 02 | Time: 44m 52s
+2024-10-06 19:03 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 19:03 - INFO - 	 Train Loss: 1.420
+2024-10-06 19:03 - INFO - 	 Val. Loss: 1.411
+2024-10-06 19:03 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 19:03 - INFO - 	 PR-AUC: 0.621
+2024-10-06 19:03 - INFO - 	 Best Val. Loss: 1.411
+2024-10-06 19:03 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 19:03 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 19:03 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 19:03 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 19:03 - INFO - ---------------------------------------------
+2024-10-06 19:48 - INFO - ---------------------------------------------
+2024-10-06 19:48 - INFO - Epoch: 03 | Time: 45m 14s
+2024-10-06 19:48 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 19:48 - INFO - 	 Train Loss: 1.420
+2024-10-06 19:48 - INFO - 	 Val. Loss: 1.411
+2024-10-06 19:48 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 19:48 - INFO - 	 PR-AUC: 0.621
+2024-10-06 19:48 - INFO - 	 Best Val. Loss: 1.411
+2024-10-06 19:48 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-06 19:48 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 19:48 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-06 19:48 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 19:48 - INFO - ---------------------------------------------
+2024-10-06 20:40 - INFO - Fit the preprocessing pipeline
+2024-10-06 20:40 - INFO - Training using device: cuda
+2024-10-06 20:40 - INFO - Creating generators
+2024-10-06 20:40 - INFO - The model has 2,246,929 trainable parameters
+2024-10-06 20:40 - INFO - * Model:
+2024-10-06 20:40 - INFO - * -----------
+2024-10-06 20:40 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-06 20:40 - INFO - * -----------
+2024-10-06 21:13 - INFO - ---------------------------------------------
+2024-10-06 21:13 - INFO - Epoch: 01 | Time: 32m 28s
+2024-10-06 21:13 - INFO - 	 New best val_rocauc loss was found, current best value is 0.36675
+2024-10-06 21:13 - INFO - 	 Train Loss: 0.799
+2024-10-06 21:13 - INFO - 	 Val. Loss: 0.809
+2024-10-06 21:13 - INFO - 	 ROC-AUC: 0.641
+2024-10-06 21:13 - INFO - 	 PR-AUC: 0.367
+2024-10-06 21:13 - INFO - 	 Best Val. Loss: 0.809
+2024-10-06 21:13 - INFO - 	 Best ROC-AUC: 0.641
+2024-10-06 21:13 - INFO - 	 Best PR-AUC: 0.367
+2024-10-06 21:13 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.605
+2024-10-06 21:13 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.336
+2024-10-06 21:13 - INFO - ---------------------------------------------
+2024-10-06 21:45 - INFO - ---------------------------------------------
+2024-10-06 21:45 - INFO - Epoch: 02 | Time: 31m 56s
+2024-10-06 21:45 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 21:45 - INFO - 	 Train Loss: 0.830
+2024-10-06 21:45 - INFO - 	 Val. Loss: 0.837
+2024-10-06 21:45 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 21:45 - INFO - 	 PR-AUC: 0.621
+2024-10-06 21:45 - INFO - 	 Best Val. Loss: 0.809
+2024-10-06 21:45 - INFO - 	 Best ROC-AUC: 0.641
+2024-10-06 21:45 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 21:45 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.605
+2024-10-06 21:45 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 21:45 - INFO - ---------------------------------------------
+2024-10-06 22:17 - INFO - ---------------------------------------------
+2024-10-06 22:17 - INFO - Epoch: 03 | Time: 32m 1s
+2024-10-06 22:17 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 22:17 - INFO - 	 Train Loss: 0.847
+2024-10-06 22:17 - INFO - 	 Val. Loss: 0.837
+2024-10-06 22:17 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 22:17 - INFO - 	 PR-AUC: 0.621
+2024-10-06 22:17 - INFO - 	 Best Val. Loss: 0.809
+2024-10-06 22:17 - INFO - 	 Best ROC-AUC: 0.641
+2024-10-06 22:17 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 22:17 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.605
+2024-10-06 22:17 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 22:17 - INFO - ---------------------------------------------
+2024-10-06 22:49 - INFO - ---------------------------------------------
+2024-10-06 22:49 - INFO - Epoch: 04 | Time: 32m 23s
+2024-10-06 22:49 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-06 22:49 - INFO - 	 Train Loss: 0.847
+2024-10-06 22:49 - INFO - 	 Val. Loss: 0.837
+2024-10-06 22:49 - INFO - 	 ROC-AUC: 0.500
+2024-10-06 22:49 - INFO - 	 PR-AUC: 0.621
+2024-10-06 22:49 - INFO - 	 Best Val. Loss: 0.809
+2024-10-06 22:49 - INFO - 	 Best ROC-AUC: 0.641
+2024-10-06 22:49 - INFO - 	 Best PR-AUC: 0.621
+2024-10-06 22:49 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.605
+2024-10-06 22:49 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-06 22:49 - INFO - ---------------------------------------------
+2024-10-06 23:28 - INFO - Fit the preprocessing pipeline
+2024-10-06 23:28 - INFO - Training using device: cuda
+2024-10-06 23:28 - INFO - Creating generators
+2024-10-06 23:28 - INFO - The model has 2,246,929 trainable parameters
+2024-10-06 23:28 - INFO - * Model:
+2024-10-06 23:28 - INFO - * -----------
+2024-10-06 23:28 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-06 23:28 - INFO - * -----------
+2024-10-07 00:13 - INFO - ---------------------------------------------
+2024-10-07 00:13 - INFO - Epoch: 01 | Time: 45m 11s
+2024-10-07 00:13 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 00:13 - INFO - 	 Train Loss: 0.847
+2024-10-07 00:13 - INFO - 	 Val. Loss: 0.837
+2024-10-07 00:13 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 00:13 - INFO - 	 PR-AUC: 0.621
+2024-10-07 00:13 - INFO - 	 Best Val. Loss: 0.837
+2024-10-07 00:13 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 00:13 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 00:13 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 00:13 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 00:13 - INFO - ---------------------------------------------
+2024-10-07 00:59 - INFO - ---------------------------------------------
+2024-10-07 00:59 - INFO - Epoch: 02 | Time: 45m 41s
+2024-10-07 00:59 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 00:59 - INFO - 	 Train Loss: 0.848
+2024-10-07 00:59 - INFO - 	 Val. Loss: 0.837
+2024-10-07 00:59 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 00:59 - INFO - 	 PR-AUC: 0.621
+2024-10-07 00:59 - INFO - 	 Best Val. Loss: 0.837
+2024-10-07 00:59 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 00:59 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 00:59 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 00:59 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 00:59 - INFO - ---------------------------------------------
+2024-10-07 01:44 - INFO - ---------------------------------------------
+2024-10-07 01:44 - INFO - Epoch: 03 | Time: 45m 24s
+2024-10-07 01:44 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 01:44 - INFO - 	 Train Loss: 0.847
+2024-10-07 01:44 - INFO - 	 Val. Loss: 0.837
+2024-10-07 01:44 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 01:44 - INFO - 	 PR-AUC: 0.621
+2024-10-07 01:44 - INFO - 	 Best Val. Loss: 0.837
+2024-10-07 01:44 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 01:44 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 01:44 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 01:44 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 01:44 - INFO - ---------------------------------------------
+2024-10-07 02:36 - INFO - Fit the preprocessing pipeline
+2024-10-07 02:36 - INFO - Training using device: cuda
+2024-10-07 02:36 - INFO - Creating generators
+2024-10-07 02:36 - INFO - The model has 2,246,929 trainable parameters
+2024-10-07 02:36 - INFO - * Model:
+2024-10-07 02:36 - INFO - * -----------
+2024-10-07 02:36 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-07 02:36 - INFO - * -----------
+2024-10-07 03:09 - INFO - ---------------------------------------------
+2024-10-07 03:09 - INFO - Epoch: 01 | Time: 32m 29s
+2024-10-07 03:09 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 03:09 - INFO - 	 Train Loss: 1.075
+2024-10-07 03:09 - INFO - 	 Val. Loss: 1.064
+2024-10-07 03:09 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 03:09 - INFO - 	 PR-AUC: 0.621
+2024-10-07 03:09 - INFO - 	 Best Val. Loss: 1.064
+2024-10-07 03:09 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 03:09 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 03:09 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 03:09 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 03:09 - INFO - ---------------------------------------------
+2024-10-07 03:41 - INFO - ---------------------------------------------
+2024-10-07 03:41 - INFO - Epoch: 02 | Time: 32m 9s
+2024-10-07 03:41 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 03:41 - INFO - 	 Train Loss: 1.074
+2024-10-07 03:41 - INFO - 	 Val. Loss: 1.064
+2024-10-07 03:41 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 03:41 - INFO - 	 PR-AUC: 0.621
+2024-10-07 03:41 - INFO - 	 Best Val. Loss: 1.064
+2024-10-07 03:41 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 03:41 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 03:41 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 03:41 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 03:41 - INFO - ---------------------------------------------
+2024-10-07 04:13 - INFO - ---------------------------------------------
+2024-10-07 04:13 - INFO - Epoch: 03 | Time: 32m 17s
+2024-10-07 04:13 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 04:13 - INFO - 	 Train Loss: 1.074
+2024-10-07 04:13 - INFO - 	 Val. Loss: 1.064
+2024-10-07 04:13 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 04:13 - INFO - 	 PR-AUC: 0.621
+2024-10-07 04:13 - INFO - 	 Best Val. Loss: 1.064
+2024-10-07 04:13 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 04:13 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 04:13 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 04:13 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 04:13 - INFO - ---------------------------------------------
+2024-10-07 04:53 - INFO - Fit the preprocessing pipeline
+2024-10-07 04:53 - INFO - Training using device: cuda
+2024-10-07 04:53 - INFO - Creating generators
+2024-10-07 04:53 - INFO - The model has 2,246,929 trainable parameters
+2024-10-07 04:53 - INFO - * Model:
+2024-10-07 04:53 - INFO - * -----------
+2024-10-07 04:53 - INFO - CombinedModel(
+  (upstream_model): TSTransformerEncoderCNN(
+    (project_input): Linear(in_features=12, out_features=128, bias=True)
+    (encoder): Linear(in_features=12, out_features=128, bias=True)
+    (transformer_encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0-7): 8 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+          )
+          (linear1): Linear(in_features=128, out_features=512, bias=True)
+          (dropout): Dropout(p=0.4, inplace=False)
+          (linear2): Linear(in_features=512, out_features=128, bias=True)
+          (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.4, inplace=False)
+          (dropout2): Dropout(p=0.4, inplace=False)
+        )
+      )
+    )
+    (output_layer): Linear(in_features=128, out_features=12, bias=True)
+    (dropout1): Dropout(p=0.4, inplace=False)
+    (cnn): Conv1d(128, 12, kernel_size=(3,), stride=(1,), padding=(1,))
+  )
+  (downstream_model): DownstreamInception(
+    (conv1): ConvBlock(
+      (conv): Conv1d(12, 64, kernel_size=(7,), stride=(2,), padding=(3,))
+      (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (conv2): ConvBlock(
+      (conv): Conv1d(64, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+      (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (maxpool): MaxPool1d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+    (inception3a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 128, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(128, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 32, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(128, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception3b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 128, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(128, 192, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(256, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(32, 96, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(256, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4a): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(480, 192, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 96, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(96, 208, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(208, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(480, 16, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(16, 48, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(480, 64, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (inception4b): InceptionBlock(
+      (branch1): ConvBlock(
+        (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+        (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (branch2): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 112, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(112, 32, kernel_size=(3,), stride=(1,), padding=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch3): Sequential(
+        (0): ConvBlock(
+          (conv): Conv1d(512, 24, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): ConvBlock(
+          (conv): Conv1d(24, 64, kernel_size=(5,), stride=(1,), padding=(2,))
+          (bn): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (branch4): Sequential(
+        (0): MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+        (1): ConvBlock(
+          (conv): Conv1d(512, 32, kernel_size=(1,), stride=(1,))
+          (bn): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (avgpool): AvgPool1d(kernel_size=(5,), stride=(1,), padding=(0,))
+    (dropout): Dropout(p=0.5, inplace=False)
+    (fc): Linear(in_features=8480, out_features=1, bias=True)
+    (sigmoid): Sigmoid()
+  )
+)
+2024-10-07 04:53 - INFO - * -----------
+2024-10-07 05:38 - INFO - ---------------------------------------------
+2024-10-07 05:38 - INFO - Epoch: 01 | Time: 45m 16s
+2024-10-07 05:38 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 05:38 - INFO - 	 Train Loss: 1.074
+2024-10-07 05:38 - INFO - 	 Val. Loss: 1.064
+2024-10-07 05:38 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 05:38 - INFO - 	 PR-AUC: 0.621
+2024-10-07 05:38 - INFO - 	 Best Val. Loss: 1.064
+2024-10-07 05:38 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 05:38 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 05:38 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 05:38 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 05:38 - INFO - ---------------------------------------------
+2024-10-07 06:24 - INFO - ---------------------------------------------
+2024-10-07 06:24 - INFO - Epoch: 02 | Time: 45m 41s
+2024-10-07 06:24 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 06:24 - INFO - 	 Train Loss: 1.074
+2024-10-07 06:24 - INFO - 	 Val. Loss: 1.064
+2024-10-07 06:24 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 06:24 - INFO - 	 PR-AUC: 0.621
+2024-10-07 06:24 - INFO - 	 Best Val. Loss: 1.064
+2024-10-07 06:24 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 06:24 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 06:24 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 06:24 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 06:24 - INFO - ---------------------------------------------
+2024-10-07 07:09 - INFO - ---------------------------------------------
+2024-10-07 07:09 - INFO - Epoch: 03 | Time: 44m 51s
+2024-10-07 07:09 - INFO - 	 New best val_rocauc loss was found, current best value is 0.62147
+2024-10-07 07:09 - INFO - 	 Train Loss: 1.074
+2024-10-07 07:09 - INFO - 	 Val. Loss: 1.064
+2024-10-07 07:09 - INFO - 	 ROC-AUC: 0.500
+2024-10-07 07:09 - INFO - 	 PR-AUC: 0.621
+2024-10-07 07:09 - INFO - 	 Best Val. Loss: 1.064
+2024-10-07 07:09 - INFO - 	 Best ROC-AUC: 0.500
+2024-10-07 07:09 - INFO - 	 Best PR-AUC: 0.621
+2024-10-07 07:09 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.500
+2024-10-07 07:09 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.627
+2024-10-07 07:09 - INFO - ---------------------------------------------

@@ -38,3 +38,4 @@ def load_downstream_model(dropout, scale, num_inputs, weights_path, cold_start=F
     if not cold_start:
         model.load_state_dict(torch.load(weights_path))
     return model
+        

@@ -68,6 +68,9 @@ def trainer(seed,                    # seed
             # plot
             plot=False,
             plot_saving_path=None,
+
+            # training
+            training_steps = np.inf
          ):
     """
     Train an experiment, save results optionally.
@@ -116,10 +119,6 @@ def trainer(seed,                    # seed
     device = torch.device(device)
     logging.info(f'Training using device: {device}')
 
-    # convert loss_function_weight
-    if loss_function_weight:
-       loss_function_weight = torch.tensor([loss_function_weight]).to(device)
-
 
     # Create Generators
     # ------------------
@@ -166,11 +165,11 @@ def trainer(seed,                    # seed
     if len(targets)>1:
         classification_criterion = nn.CrossEntropyLoss()        
     else:
-        if loss_function_weight:
-            classification_criterion = nn.BCELoss(loss_function_weight)
-            reconstruction_criterion = nn.MSELoss(loss_function_weight)
+        if loss_function_weight is not None:
+            classification_criterion = nn.BCELoss(reduction='none')
+            reconstruction_criterion = nn.MSELoss()
         else: 
-            classification_criterion = nn.BCELoss()
+            classification_criterion = nn.BCELoss(reduction='none')
             reconstruction_criterion = nn.MSELoss()
 
     logging.info(f'The model has {count_parameters(model):,} trainable parameters')
@@ -197,6 +196,8 @@ def trainer(seed,                    # seed
 
     # plot before fine-tuning
     if plot:
+        if not os.path.exists(plot_saving_path):
+            os.mkdir(plot_saving_path)
         plot_test_signals_12leads_SHL(model.upstream_model, 
                             test_generator, 
                             device, 
@@ -221,6 +222,8 @@ def trainer(seed,                    # seed
                            epoch,
                            reconstruction_criterion,
                            reconstruction_loss_weight,
+                           loss_function_weight,
+                           training_steps
                            )        
         
 
@@ -232,6 +235,7 @@ def trainer(seed,                    # seed
                               epoch,
                               reconstruction_criterion,
                               reconstruction_loss_weight,
+                              loss_function_weight,
                            )
         
         # test
@@ -243,6 +247,7 @@ def trainer(seed,                    # seed
                                 epoch,
                                 reconstruction_criterion,
                                 reconstruction_loss_weight,
+                                loss_function_weight,
                                 )
             
         if plot:
@@ -608,8 +613,11 @@ def train_epoch(
         epoch,
         reconstruction_criterion = None,
         reconstruction_loss_weight = 0,
+        loss_function_weight = None,
+        steps = np.inf
         ):
     
+
     # set model on training state and init epoch loss    
     model.train()
     epoch_loss = 0
@@ -619,15 +627,15 @@ def train_epoch(
 
     # get number of iterations for the progress bar. 
     it = iter(iterator)
-    T = len(iterator)
+    T = min(len(iterator),steps)
     # set progress bar
     t = trange(T, desc='Within epoch loss (training)', leave=True)
-
+    
     for i in t:
         # get data
         X, y, _ = next(it)
         # y=np.squeeze(y,-1)
-
+        
         # don't run if there are NaNs
         if np.isnan(X).sum()>0:
             print('skipping because of NaNs')
@@ -637,6 +645,13 @@ def train_epoch(
         X = process(X)    
         # X = torch.from_numpy(X)
         y = torch.from_numpy(y).type(torch.FloatTensor)
+
+        # convert loss_function_weight
+        if loss_function_weight is not None:
+            weights = torch.where(y == 1., loss_function_weight, 1)
+        else:
+            weights = torch.where(y == 1, 1, 1)
+        weights = weights.to(device)
 
         X = X.to(device)
         y = y.to(device)
@@ -656,9 +671,9 @@ def train_epoch(
 
         # get current relevant loss
         if not isinstance(reconstruction_loss_weight, List):
-            loss = (1 - reconstruction_loss_weight) * classification_criterion(output, y) + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
+            loss = (1 - reconstruction_loss_weight) * (classification_criterion(output, y)*weights).mean() + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
         else:
-            loss = (1 - reconstruction_loss_weight[epoch]) * classification_criterion(output, y) + reconstruction_loss_weight[epoch] * reconstruction_criterion(filtered_target, filtered_output)
+            loss = (1 - reconstruction_loss_weight[epoch]) * (classification_criterion(output, y)*weights).mean() + reconstruction_loss_weight[epoch] * reconstruction_criterion(filtered_target, filtered_output)
 
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
@@ -685,6 +700,7 @@ def evaluate_epoch(model,
                    epoch,
                    reconstruction_criterion,
                    reconstruction_loss_weight,
+                   loss_function_weight,
                    ):
     
     # set model on training state and init epoch loss    
@@ -719,6 +735,13 @@ def evaluate_epoch(model,
             # X = torch.from_numpy(X)
             y = torch.from_numpy(y)
 
+            # convert loss_function_weight
+            if loss_function_weight is not None:
+                weights = torch.where(y == 1., loss_function_weight, 1)
+            else:
+                weights = torch.where(y == 1, 1, 1)
+            weights = weights.to(device)
+
             X = X.to(device)
             y = y.to(device)
             
@@ -735,9 +758,10 @@ def evaluate_epoch(model,
             
             # get current relevant loss
             if not isinstance(reconstruction_loss_weight, List):
-                loss = (1 - reconstruction_loss_weight) * classification_criterion(output, y) + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
+                loss = (1 - reconstruction_loss_weight) * (classification_criterion(output, y)*weights).mean() + reconstruction_loss_weight * reconstruction_criterion(filtered_target, filtered_output)
             else:
-                loss = (1 - reconstruction_loss_weight[epoch]) * classification_criterion(output, y) + reconstruction_loss_weight[epoch] * reconstruction_criterion(filtered_target, filtered_output)
+                loss = (1 - reconstruction_loss_weight[epoch]) * (classification_criterion(output, y)*weights).mean() + reconstruction_loss_weight[epoch] * reconstruction_criterion(filtered_target, filtered_output)
+
 
             epoch_loss += loss.item()
 
@@ -765,3 +789,57 @@ def epoch_time(start_time, end_time):
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+
+
+def evaluate_mutilpe_models(
+        models:List, 
+        iterator, 
+        device):
+    
+    # set model on training state and init epoch loss    
+    [model.eval() for model in models]
+
+    # get number of iterations for the progress bar. n_iters can be set to bypass it
+    it = iter(iterator)
+    T = len(iterator)
+    # set progress bar
+    t = trange(T, desc='Within epoch loss (validation)', leave=True)
+    
+    results = {}
+    
+    for M, model in enumerate(models):
+        ys = []
+        outputs = []
+        ids = []
+
+        with torch.no_grad():
+            for i in t:
+
+                # get data
+                X, y, ids_batch = next(it)
+                # y=np.squeeze(y,-1)
+                
+                # don't run if there are NaNs
+                if np.isnan(X).sum()>0:
+                    print('skipping because of NaNs')
+                    continue
+                y = np.float32(y)
+                
+                X = process(X)    
+                # X = torch.from_numpy(X)
+                y = torch.from_numpy(y)
+
+                X = X.to(device)
+                y = y.to(device)
+                
+                
+                output = model(X)
+                ys += y.to('cpu').numpy().reshape(-1).tolist()
+                outputs += output.to('cpu').numpy().reshape(-1).tolist()
+                ids+=ids_batch
+
+        results[M]=(ys, outputs, ids)
+    
+    return results
