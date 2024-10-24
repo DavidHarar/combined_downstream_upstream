@@ -1,34 +1,29 @@
 from typing import List
 
+import os
+import logging
 import pickle
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import random
 import time
-
-from downstream_classification.dataloader.DataGenerator import DataGenerator
-from combined_downstream_upstream.modeling.JointModel import CombinedModel
-# from downstream_classification.dataloader.DataLoader import DataGenerator
-# from combined_downstream_upstram.modeling.JointModel import CombinedModel
-
-from combined_downstream_upstream.utils.plots import plot_test_signals_12leads_SHL
-
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import trange
 from tqdm.auto import tqdm
-from downstream_classification.utils.metrics import *
-from combined_downstream_upstream.utils.plots import *
 from sklearn.model_selection import ParameterGrid
 
-import os
+from downstream_classification.dataloader.DataGenerator import DataGenerator, DataGenerator_ptb
+from combined_downstream_upstream.modeling.JointModel import CombinedModel
+# from downstream_classification.dataloader.DataLoader import DataGenerator
+# from combined_downstream_upstram.modeling.JointModel import CombinedModel
 
-import logging
+from combined_downstream_upstream.utils.plots import plot_test_signals_12leads_SHL
+from downstream_classification.utils.metrics import *
+from combined_downstream_upstream.utils.plots import *
 
 
 # to be moved to utils
@@ -64,6 +59,8 @@ def trainer(seed,                    # seed
             reconstruction_loss_weight = 0,
 
             check_on_test = False,
+            internal_data=True,
+            channels_to_turn_off = 0,
 
             # plot
             plot=False,
@@ -71,6 +68,8 @@ def trainer(seed,                    # seed
 
             # training
             training_steps = np.inf
+
+
          ):
     """
     Train an experiment, save results optionally.
@@ -113,45 +112,80 @@ def trainer(seed,                    # seed
     # Fix randomness
     # ------------------
     random.seed(seed)
+    np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = torch.device(device)
     logging.info(f'Training using device: {device}')
+    # torch.backends.cudnn.deterministic = True
 
 
     # Create Generators
     # ------------------
     logging.info(f'Creating generators')
-    train_generator = DataGenerator(
-        metadata_file_path= metadata_file_path,                 # path to metadata file
-        data_folder_path = data_folder_path,                    # path to individual signals
-        sample='train',                                         # sample we want to create a generator to. Either train, validation or test
-        targets=targets,                                        # list of targets we want train on
-        batch_size=batch_size,                                  # batch size
-        shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
-        seed = seed
-                    )
-    validation_generator = DataGenerator(
-        metadata_file_path= metadata_file_path,                 # path to metadata file
-        data_folder_path = data_folder_path,                    # path to individual signals
-        sample='validation',                                    # sample we want to create a generator to. Either train, validation or test
-        targets=targets,                                        # list of targets we want train on
-        batch_size=batch_size,                                  # batch size
-        shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
-        seed = seed
-                    )
+    if internal_data:
+        train_generator = DataGenerator(
+            metadata_file_path= metadata_file_path,                 # path to metadata file
+            data_folder_path = data_folder_path,                    # path to individual signals
+            sample='train',                                         # sample we want to create a generator to. Either train, validation or test
+            targets=targets,                                        # list of targets we want train on
+            batch_size=batch_size,                                  # batch size
+            shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
+            seed = seed
+                        )
+        validation_generator = DataGenerator(
+            metadata_file_path= metadata_file_path,                 # path to metadata file
+            data_folder_path = data_folder_path,                    # path to individual signals
+            sample='validation',                                    # sample we want to create a generator to. Either train, validation or test
+            targets=targets,                                        # list of targets we want train on
+            batch_size=batch_size,                                  # batch size
+            shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
+            seed = seed
+                        )
 
-    test_generator = DataGenerator(
-        metadata_file_path= metadata_file_path,                 # path to metadata file
-        data_folder_path = data_folder_path,                    # path to individual signals
-        sample='test',                                          # sample we want to create a generator to. Either train, validation or test
-        targets=targets,                                        # list of targets we want train on
-        batch_size=batch_size,                                  # batch size
-        shuffle=False,                                            # Whether to shuffle the list of IDs at the end of each epoch.
-        seed = seed
-                                )
-    
+        test_generator = DataGenerator(
+            metadata_file_path= metadata_file_path,                 # path to metadata file
+            data_folder_path = data_folder_path,                    # path to individual signals
+            sample='test',                                          # sample we want to create a generator to. Either train, validation or test
+            targets=targets,                                        # list of targets we want train on
+            batch_size=batch_size,                                  # batch size
+            shuffle=False,                                            # Whether to shuffle the list of IDs at the end of each epoch.
+            seed = seed
+                                    )
+    else:
+        train_generator = DataGenerator_ptb(
+            data_folder_path=data_folder_path,
+            metadata_file_path=metadata_file_path,
+            targets=targets,
+            sample='train',
+            seed=seed,
+            batch_size=batch_size,
+            shuffle = True,
+            channels_to_turn_off = channels_to_turn_off
+        )
+
+        validation_generator = DataGenerator_ptb(
+            data_folder_path=data_folder_path,
+            metadata_file_path=metadata_file_path,
+            targets=targets,
+            sample='validation',
+            seed=seed,
+            batch_size=batch_size,
+            shuffle = True,
+            channels_to_turn_off = channels_to_turn_off
+        )
+
+        test_generator = DataGenerator_ptb(
+            data_folder_path=data_folder_path,
+            metadata_file_path=metadata_file_path,
+            targets=targets,
+            sample='test',
+            seed=seed,
+            batch_size=batch_size,
+            shuffle = True,
+            channels_to_turn_off = channels_to_turn_off
+        )
     
     
     # create a model
@@ -324,8 +358,8 @@ def trainer(seed,                    # seed
             if valid_loss < best_valid_loss:
                 if model_saving_path is not None:
                     fig, axs = plt.subplots(1, 2, figsize = (10,3))
-                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0])
-                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1])
+                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0], bins=100)
+                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1], bins=100)
                     axs[0].set_title('Scores Distribution on the Training Set')
                     axs[1].set_title('Scores Distribution on the Validation Set')
                     axs[0].axvline(threshold, c='r')
@@ -338,8 +372,8 @@ def trainer(seed,                    # seed
             if aucpr > best_aucpr:
                 if model_saving_path is not None:
                     fig, axs = plt.subplots(1, 2, figsize = (10,3))
-                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0])
-                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1])
+                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0], bins=100)
+                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1], bins=100)
                     axs[0].set_title('Scores Distribution on the Training Set')
                     axs[1].set_title('Scores Distribution on the Validation Set')
                     axs[0].axvline(threshold, c='r')
@@ -352,8 +386,8 @@ def trainer(seed,                    # seed
             if rocauc > best_rocauc:
                 if model_saving_path is not None:
                     fig, axs = plt.subplots(1, 2, figsize = (10,3))
-                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0])
-                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1])
+                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0], bins=100)
+                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1], bins=100)
                     axs[0].set_title('Scores Distribution on the Training Set')
                     axs[1].set_title('Scores Distribution on the Validation Set')
                     axs[0].axvline(threshold, c='r')
@@ -366,8 +400,8 @@ def trainer(seed,                    # seed
             if recall_for_precision > best_recall_for_precision:
                 if model_saving_path is not None:
                     fig, axs = plt.subplots(1, 2, figsize = (10,3))
-                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0])
-                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1])
+                    sns.histplot(data = y_train_prediction, x = 'y_train_pred', hue = 'y_train', common_norm=False, stat='probability', ax=axs[0], bins=100)
+                    sns.histplot(data = y_valication_prediction, x = 'y_val_pred', hue = 'y_val', common_norm=False, stat='probability', ax=axs[1], bins=100)
                     axs[0].set_title('Scores Distribution on the Training Set')
                     axs[1].set_title('Scores Distribution on the Validation Set')
                     axs[0].axvline(threshold, c='r')
@@ -484,12 +518,13 @@ def trainer(seed,                    # seed
 
 
     validation_data['y_pred'] = predictions
-    post_reg_analysis(
-        data = validation_data,
-        y_true_column=target_str,
-        y_pred_column='y_pred',
-        saving_path=model_saving_path
-    )
+    if internal_data:
+        post_reg_analysis(
+            data = validation_data,
+            y_true_column=target_str,
+            y_pred_column='y_pred',
+            saving_path=model_saving_path
+        )
 
     logging.shutdown()
 
