@@ -879,9 +879,9 @@ def evaluate_mutilpe_models(
     
     return results
 
-def epoch_0_results(
-        # seed,                    # No randomness
-        metadata_file_path,      # metadata file include 
+
+def combined_results_without_joint_training_on_test(
+        metadata_file_path,
         data_folder_path, 
         targets,
         batch_size, 
@@ -896,11 +896,10 @@ def epoch_0_results(
 
         reconstruction_loss_weight = 0,
 
-        check_on_test = False,
         internal_data=True,
         channels_to_turn_off = 0,
-
-         ):
+        ):
+    
     # create a mapping for all possible leads
     # ------------------
     leads_and_their_indices = {x:i for i,x in enumerate(['LI', 'LII', 'LIII', 'aVF', 'aVL', 'aVR','V1','V2','V3','V4','V5','V6'])}
@@ -920,25 +919,6 @@ def epoch_0_results(
     # dataloader
     # ------------------
     if internal_data:
-        train_generator = DataGenerator(
-            metadata_file_path= metadata_file_path,                 # path to metadata file
-            data_folder_path = data_folder_path,                    # path to individual signals
-            sample='train',                                         # sample we want to create a generator to. Either train, validation or test
-            targets=targets,                                        # list of targets we want train on
-            batch_size=batch_size,                                  # batch size
-            shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
-            seed = seed
-                        )
-        validation_generator = DataGenerator(
-            metadata_file_path= metadata_file_path,                 # path to metadata file
-            data_folder_path = data_folder_path,                    # path to individual signals
-            sample='validation',                                    # sample we want to create a generator to. Either train, validation or test
-            targets=targets,                                        # list of targets we want train on
-            batch_size=batch_size,                                  # batch size
-            shuffle=True,                                            # Whether to shuffle the list of IDs at the end of each epoch.
-            seed = seed
-                        )
-
         test_generator = DataGenerator(
             metadata_file_path= metadata_file_path,                 # path to metadata file
             data_folder_path = data_folder_path,                    # path to individual signals
@@ -949,28 +929,6 @@ def epoch_0_results(
             seed = seed
                                     )
     else:
-        train_generator = DataGenerator_ptb(
-            data_folder_path=data_folder_path,
-            metadata_file_path=metadata_file_path,
-            targets=targets,
-            sample='train',
-            seed=seed,
-            batch_size=batch_size,
-            shuffle = True,
-            channels_to_turn_off = channels_to_turn_off
-        )
-
-        validation_generator = DataGenerator_ptb(
-            data_folder_path=data_folder_path,
-            metadata_file_path=metadata_file_path,
-            targets=targets,
-            sample='validation',
-            seed=seed,
-            batch_size=batch_size,
-            shuffle = True,
-            channels_to_turn_off = channels_to_turn_off
-        )
-
         test_generator = DataGenerator_ptb(
             data_folder_path=data_folder_path,
             metadata_file_path=metadata_file_path,
@@ -986,7 +944,6 @@ def epoch_0_results(
     # ------------------
     model = CombinedModel(upstream_model, downstream_model, device, continue_training_upstream_model, impute_only_missing)
     model = model.to(device)
-    # optimizer = optim.AdamW(model.parameters(), weight_decay=weight_decay, lr=lr) # no optimization
 
     # define loss
     if len(targets)>1:
@@ -999,39 +956,27 @@ def epoch_0_results(
             classification_criterion = nn.BCELoss(reduction='none')
             reconstruction_criterion = nn.MSELoss()
 
-    # evaluate
-    valid_loss, y_val, y_val_pred = evaluate_epoch(model, 
-                            validation_generator, 
-                            classification_criterion, 
-                            device,
-                            0,
-                            reconstruction_criterion,
-                            reconstruction_loss_weight,
-                            loss_function_weight,
-                        )
     
     # test
-    if check_on_test:
-        test_loss, y_test, y_test_pred = evaluate_epoch(model, 
-                            test_generator, 
-                            classification_criterion, 
-                            device,
-                            0,
-                            reconstruction_criterion,
-                            reconstruction_loss_weight,
-                            loss_function_weight,
-                            )
-    
+    test_loss, y_test, y_test_pred = evaluate_epoch(model, 
+                        test_generator, 
+                        classification_criterion, 
+                        device,
+                        0,
+                        reconstruction_criterion,
+                        reconstruction_loss_weight,
+                        loss_function_weight,
+                        )
+
     # Plot distributions
-    y_valication_prediction = pd.DataFrame({'y_val': y_val,
-                                            'y_val_pred':y_val_pred})
+    # y_valication_prediction = pd.DataFrame({'y_val': y_val,
+    #                                         'y_val_pred':y_val_pred})
     
-    if check_on_test:
-        y_test_prediction = pd.DataFrame({'y_test': y_test,
-                                            'y_test_pred':y_test_pred})
+    y_test_prediction = pd.DataFrame({'y_test': y_test,
+                                        'y_test_pred':y_test_pred})
 
 
-    aucpr  = PRAUC(y_val, y_val_pred)
-    rocauc = ROCAUC(y_val, y_val_pred)
+    aucpr  = PRAUC(y_test, y_test_pred)
+    rocauc = ROCAUC(y_test, y_test_pred)
 
     return aucpr, rocauc
