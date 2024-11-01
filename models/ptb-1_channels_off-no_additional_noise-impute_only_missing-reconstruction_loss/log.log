@@ -1878,3 +1878,15 @@
 2024-10-26 17:12 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.985
 2024-10-26 17:12 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.888
 2024-10-26 17:12 - INFO - ---------------------------------------------
+2024-10-26 17:20 - INFO - ---------------------------------------------
+2024-10-26 17:20 - INFO - Epoch: 04 | Time: 8m 16s
+2024-10-26 17:20 - INFO - 	 Train Loss: 0.019
+2024-10-26 17:20 - INFO - 	 Val. Loss: 0.024
+2024-10-26 17:20 - INFO - 	 ROC-AUC: 0.988
+2024-10-26 17:20 - INFO - 	 PR-AUC: 0.891
+2024-10-26 17:20 - INFO - 	 Best Val. Loss: 0.024
+2024-10-26 17:20 - INFO - 	 Best ROC-AUC: 0.989
+2024-10-26 17:20 - INFO - 	 Best PR-AUC: 0.905
+2024-10-26 17:20 - INFO - 	 Test-ROC-AUC under Best Validation ROC-AUC: 0.985
+2024-10-26 17:20 - INFO - 	 Test-PR-AUC under Best Validation Best PR-AUC: 0.888
+2024-10-26 17:20 - INFO - ---------------------------------------------
