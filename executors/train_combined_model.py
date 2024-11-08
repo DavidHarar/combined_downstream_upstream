@@ -27,9 +27,9 @@ from combined_downstream_upstream.utils.plots import *
 
 
 # to be moved to utils
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(device)
-def process(X):
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# print(device)
+def process(X, device):
     src_ = np.float32(np.transpose(X, axes=(2,0,1)))
     src_ = torch.from_numpy(src_).to(device)
     return src_
@@ -48,6 +48,8 @@ def trainer(seed,                    # seed
             downstream_model,
             continue_training_upstream_model,
             model_saving_path,
+            
+            predefined_device = None,
 
             leads = ['LI', 'LII', 'LIII', 'aVF', 'aVL', 'aVR','V1','V2','V3','V4','V5','V6'],
             eval_metric = 'loss',
@@ -115,8 +117,10 @@ def trainer(seed,                    # seed
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    device = torch.device(device)
+    if predefined_device is None:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    else:
+        device = predefined_device
     logging.info(f'Training using device: {device}')
     # torch.backends.cudnn.deterministic = True
 
@@ -677,7 +681,7 @@ def train_epoch(
             continue
         y = np.float32(y)
 
-        X = process(X)    
+        X = process(X,device)
         # X = torch.from_numpy(X)
         y = torch.from_numpy(y).type(torch.FloatTensor)
 
@@ -766,7 +770,7 @@ def evaluate_epoch(model,
                 continue
             y = np.float32(y)
             
-            X = process(X)    
+            X = process(X, device)    
             # X = torch.from_numpy(X)
             y = torch.from_numpy(y)
 
@@ -862,7 +866,7 @@ def evaluate_mutilpe_models(
                     continue
                 y = np.float32(y)
                 
-                X = process(X)    
+                X = process(X, device)    
                 # X = torch.from_numpy(X)
                 y = torch.from_numpy(y)
 
