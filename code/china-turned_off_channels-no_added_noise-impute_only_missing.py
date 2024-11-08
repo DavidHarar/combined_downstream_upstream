@@ -14,8 +14,14 @@ import pickle
 # os.chdir('/home/david/Desktop/projects/thesis/downstream_classification')
 
 # MAC
-sys.path.append('/Users/davidharar/Documents/School/thesis/git_repositories/')
-os.chdir('/Users/davidharar/Documents/School/thesis/git_repositories/')
+# sys.path.append('/Users/davidharar/Documents/School/thesis/git_repositories/')
+# os.chdir('/Users/davidharar/Documents/School/thesis/git_repositories/')
+
+# HUJI
+sys.path.append('/sci/home/david.harar/Desktop/')
+os.chdir('/sci/home/david.harar/Desktop/')
+
+
 
 from combined_downstream_upstream.utils.LoadModels import *
 from combined_downstream_upstream.executors.train_combined_model import trainer
@@ -32,7 +38,7 @@ upstream_params = {
     'dropout': 0.4,
     'clip': 1,
     'positional_encodings': False,
-    'device':'mps'
+    'device':'cuda'
 }
 
 # get global argumnents
@@ -73,7 +79,7 @@ config = {
             'patience':3,
             'clip':1,
             'loss_function_weight':None,
-            'predefined_device':'mps',
+            'predefined_device':'cuda',
 
             # Experiment settings
             'impute_only_missing':True,
