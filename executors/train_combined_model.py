@@ -97,8 +97,10 @@ def trainer(seed,                    # seed
 
     # Init experiment directory
     if not os.path.exists(model_saving_path):
+        print(f'Openning a new folder at: {model_saving_path}')
         os.makedirs(model_saving_path)
-
+    else:
+        print(f'Folder already exists at {model_saving_path}')
     # init log
     logging.basicConfig(filename=f"./{model_saving_path}/log.log", level=logging.INFO,
                             format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M')

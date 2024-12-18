@@ -19,7 +19,7 @@ def get_best_upsteam_model(folder_path = './upstream_seq2seq/models/', model_nam
     return best_model_path
 
 
-def load_upstream_model(params, folder_path, model_name, device='cude', upstream_path = None, cold_start=False):
+def load_upstream_model(params, folder_path, model_name, device='cuda', upstream_path = None, cold_start=False):
     upstream_path = get_best_upsteam_model(folder_path, model_name)
     print('Upstream Model File Path:', upstream_path)
     upstream_model = TSTransformerEncoderCNN(
@@ -36,6 +36,6 @@ def load_upstream_model(params, folder_path, model_name, device='cude', upstream
 def load_downstream_model(dropout, scale, num_inputs, weights_path, device='cuda', cold_start=False):
     model = DownstreamInception(dropout=dropout, scale=scale, num_inputs=num_inputs).to(device)
     if not cold_start:
-        model.load_state_dict(torch.load(weights_path))
+        model.load_state_dict(torch.load(weights_path, map_location=device))
     return model
         

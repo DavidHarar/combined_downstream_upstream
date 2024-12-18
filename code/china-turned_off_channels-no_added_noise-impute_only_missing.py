@@ -10,18 +10,12 @@ import pickle
 # import trainer
 # -----------------------------
 # PC
-# sys.path.append('/home/david/Desktop/projects/thesis/downstream_classification')
-# os.chdir('/home/david/Desktop/projects/thesis/downstream_classification')
+sys.path.append('/home/david/Desktop/projects/thesis/')
+os.chdir('/home/david/Desktop/projects/thesis/')
 
 # MAC
 # sys.path.append('/Users/davidharar/Documents/School/thesis/git_repositories/')
 # os.chdir('/Users/davidharar/Documents/School/thesis/git_repositories/')
-
-# HUJI
-sys.path.append('/sci/home/david.harar/Desktop/')
-os.chdir('/sci/home/david.harar/Desktop/')
-
-
 
 from combined_downstream_upstream.utils.LoadModels import *
 from combined_downstream_upstream.executors.train_combined_model import trainer
@@ -79,7 +73,7 @@ config = {
             'patience':3,
             'clip':1,
             'loss_function_weight':None,
-            'predefined_device':'cuda',
+            # 'predefined_device':'cuda',
 
             # Experiment settings
             'impute_only_missing':True,
@@ -105,15 +99,18 @@ for seed_ in seeds:
     config['data_folder_path']      = './downstream_classification/data/china-processed_divided_into_450/'
 
     config['internal_data']         = False
-    config['channels_to_turn_off']  = 0
+    config['channels_to_turn_off']  = args.num_channels_to_turn_off
     config['model_saving_path']     = f"./combined_downstream_upstream/models/china-{config['channels_to_turn_off']}_channels_off-no_additional_noise-impute_only_missing"
-    config['plot_saving_path']      = f"/home/david/Desktop/projects/thesis/combined_downstream_upstream/plots/china-{config['channels_to_turn_off']}_channels_off-no_additional_noise-impute_only_missing"
+    config['plot_saving_path']      = f"./combined_downstream_upstream/plots/china-{config['channels_to_turn_off']}_channels_off-no_additional_noise-impute_only_missing"
 
-    upstream_model   = load_upstream_model(upstream_params, folder_path = './upstream_seq2seq/models/', model_name = 'transformer_cnn_4heads', device = upstream_params['device'])
+    upstream_model   = load_upstream_model(upstream_params, 
+                                           folder_path = './upstream_seq2seq/models/', 
+                                           model_name = 'transformer_cnn_4heads', 
+                                           device = upstream_params['device'])
     downstream_model = load_downstream_model(
         dropout=0.5,scale=1,num_inputs=12, 
-        weights_path=f"./downstream_classification/models/AF-V10-different-seeds-china-{config['channels_to_turn_off']}_channels_off-saving-downstream-models/model_val_aucpr_seed_17.pt",
-        device = config['predefined_device']
+        device='cuda',
+        weights_path=f"./downstream_classification/models/AF-V10-different-seeds-china-{config['channels_to_turn_off']}_channels_off-saving-downstream-models/model_val_aucpr_seed_17.pt"
         )
 
     config['upstream_model']=upstream_model
@@ -137,3 +134,11 @@ for seed_ in seeds:
 
 
 
+# %%
+# import pickle
+# file_path = '/home/david/Desktop/projects/thesis/combined_downstream_upstream/models/china-0_channels_off-no_additional_noise-impute_only_missing/best_rocauc_and_pr_auc.pkl'
+
+# with open(file_path, 'rb') as file:
+#     model_data = pickle.load(file)
+# model_data
+# %%

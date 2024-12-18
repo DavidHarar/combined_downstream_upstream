@@ -34,6 +34,7 @@ upstream_params = {
 # -----------------------------
 parser = argparse.ArgumentParser(description="Run trainer with specified number of channels to turn off.")
 parser.add_argument('--num_channels_to_turn_off', type=int, required=True, help='Number of channels to turn off')
+# parser.add_argument('--num_seeds', type=int, required=True, help='Number of seeds to run')
 
 args = parser.parse_args()
 
@@ -51,7 +52,7 @@ best_rocauc_and_pr_auc = {
 
 seed = 123
 np.random.seed(123)
-seeds = np.random.randint(0,1000, 15)
+seeds = np.random.randint(0,1000, 5)
 
 config = {
             # general
@@ -101,7 +102,7 @@ for seed_ in seeds:
         upstream_params, 
         folder_path = './upstream_seq2seq/models/', 
         model_name = 'transformer_cnn_4heads', 
-        cold_start=True
+        cold_start=False
         )
 
     downstream_model = load_downstream_model(
